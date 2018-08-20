@@ -4,7 +4,7 @@ from stmt import *
 
 class IPGeneralizer(Generalizer):
 
-    def __init__(self,trace,record_annotation,input,initial_formula=True):
+    def __init__(self,trace,input = None, record_annotation = False, initial_formula=True):
         super().__init__(trace,record_annotation,initial_formula)
         self.input = input
 
