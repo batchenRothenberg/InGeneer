@@ -1,0 +1,2 @@
+# InGeneer
+Input generalization tool
