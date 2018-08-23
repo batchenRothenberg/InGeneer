@@ -55,3 +55,7 @@ def get_vars_and_coefficients(f):
 
     collect(f)
     return r
+
+
+def negate_condition(cond):
+    pass
