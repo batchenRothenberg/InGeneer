@@ -78,3 +78,53 @@ class IntervalSet:
 
     def is_bottom(self):
         return any([v.is_bottom() for v in self.dict.values()])
+
+
+def max_of_two_with_minf(n, m):
+    if isinstance(n, str):
+        assert n == MINF
+        return m
+    elif isinstance(m, str):
+        assert m == MINF
+        return n
+    else:
+        assert isinstance(n, int) and isinstance(m, int)
+        if n > m:
+            return n
+        else:
+            return m
+
+
+def max_with_minf(numbers):
+    max = MINF
+    for n in numbers:
+        max = max_of_two_with_minf(max, n)
+    return max
+
+
+def min_of_two_with_inf(n, m):
+    if isinstance(n, str):
+        assert n == INF
+        return m
+    elif isinstance(m, str):
+        assert m == INF
+        return n
+    else:
+        assert isinstance(n, int) and isinstance(m, int)
+        if n < m:
+            return n
+        else:
+            return m
+
+
+def min_with_inf(numbers):
+    min = INF
+    for n in numbers:
+        min = min_of_two_with_inf(min, n)
+    return min
+
+
+def interval_intersection(intervals):
+    max_low = max_with_minf([i.low for i in intervals])
+    min_high = min_with_inf([i.high for i in intervals])
+    return Interval("x", max_low, min_high)
