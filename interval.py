@@ -2,63 +2,178 @@ import sys
 
 MINF = "minf"
 INF = "inf"
+MAXINT = sys.maxsize
+MININT = -sys.maxsize - 1
 _UBOT = u'\u27D8'
 _UTOP = u'\u27D9'
 _UINF = u'\u221E'
 _UIN = u'\u220A'
 
 
+def inf_str_to_number(st):
+    assert isinstance(st, str) and (st == INF or st == MINF)
+    if st == INF:
+        return MAXINT
+    else:
+        return MININT
+
+
+class IntervalBorder:
+
+    def __init__(self, n):
+        assert (isinstance(n, int) or n == MINF or n == INF)
+        self.n = n
+
+    def __str__(self):
+        if isinstance(self.n, int):
+            return str(self.n)
+        if self.n == MINF:
+            return "-" + _UINF
+        return _UINF
+
+    def __repr__(self):
+        return str(self)
+
+    def __eq__(self, other):
+        if isinstance(self.n, int):
+            if isinstance(other, int):
+                return self.n == other
+            elif isinstance(other, IntervalBorder) and isinstance(other.n, int):
+                return self.n == other.n
+            else:
+                return False
+        else:
+            assert self.n == MINF or self.n == INF
+            if isinstance(other, str):
+                return self.n == other
+            elif isinstance(other, IntervalBorder) and isinstance(other.n, str):
+                return self.n == other.n
+            else:
+                return False
+
+    def __ne__(self, other):
+        return not __eq__(self, other)
+
+    def __lt__(self, other):
+        assert (isinstance(other, int) or isinstance(other, IntervalBorder) or other == MINF or other == INF)
+        if isinstance(other, str) and other == MINF:
+            return False
+        if isinstance(self.n, str) and self.n == MINF:
+            return True
+        if isinstance(self.n, str) and self.n == INF:
+            return False
+        if isinstance(other, str) and other == INF:
+            return True
+        assert isinstance(self.n, int) and (isinstance(other, int) or isinstance(other, IntervalBorder))
+        if isinstance(other, int):
+            return self.n < other
+        else:
+            return self.n < other.n
+
+    def __gt__(self, other):
+        assert (isinstance(other, int) or isinstance(other, IntervalBorder) or other == MINF or other == INF)
+        if isinstance(other, str) and other == INF:
+            return False
+        if isinstance(self.n, str) and self.n == INF:
+            return True
+        if isinstance(self.n, str) and self.n == MINF:
+            return False
+        if isinstance(other, str) and other == MINF:
+            return True
+        assert isinstance(self.n, int) and (isinstance(other, int) or isinstance(other, IntervalBorder))
+        if isinstance(other, int):
+            return self.n > other
+        else:
+            return self.n > other.n
+
+    def __le__(self, other):
+        return __lt__(self, other) or __eq__(self, other)
+
+    def __ge__(self, other):
+        return __gt__(self, other) or __eq__(self, other)
+
+    def is_inf(self):
+        return isinstance(self.n, str) and self.n == INF
+
+    def is_minf(self):
+        return isinstance(self.n, str) and self.n == MINF
+
+    def __radd__(self, other):
+        other_is_int = isinstance(other, int)
+        self_is_int = isinstance(self.n, int)
+        assert (other_is_int or other == MINF or other == INF)
+
+        # Can't add MINF to INF and vice versa
+        assert not (not other_is_int and not self_is_int and self.n == INF and other == MINF)
+        assert not (not other_is_int and not self_is_int and self.n == MINF and other == INF)
+
+        if (not self_is_int and self.n == MINF) or (not other_is_int and other == MINF):
+            return inf_str_to_number(MINF)
+        if (not self_is_int and self.n == INF) or (not other_is_int and other == INF):
+            return inf_str_to_number(INF)
+        else:
+            return self.n + other
+
+    def add(self, other):
+        assert isinstance(other, IntervalBorder)
+        return self.n + other
+
+    def __neg__(self):
+        if isinstance(self.n, int):
+            return -self.n
+        elif self.n == INF:
+            return -inf_str_to_number(INF)
+        else:
+            return inf_str_to_number(INF)
+
+
 class Interval:
 
-    def __init__(self, var, low, high):
+    def __init__(self, low, high):
         assert (isinstance(low, int) or low == MINF)
         assert (isinstance(high, int) or high == INF)
-        self.low = low
-        self.high = high
-        self.var = var
+        self.low = IntervalBorder(low)
+        self.high = IntervalBorder(high)
 
     def __str__(self):
         l = str(self.low)
         h = str(self.high)
-        if self.low == MINF:
-            l = "-" + _UINF
-        if self.high == INF:
-            h = _UINF
         if self.is_bottom():
-            return self.var + _UIN + u'\u27C2'
-        return self.var + _UIN + "[" + l + "," + h + "]"
+            return u'\u27C2'
+        return "[" + l + "," + h + "]"
 
     def __repr__(self):
         return str(self)
 
     def is_bottom(self):
-        return isinstance(self.low, int) and isinstance(self.high, int) and self.high < self.low
+        return self.high < self.low
 
     def is_top(self):
-        return self.low == MINF and self.high == INF
+        return self.low.is_minf() and self.high.is_inf()
 
     def is_infinite(self):
-        return self.low == MINF or self.high == INF
+        return self.low.is_minf() or self.high.is_inf()
 
     def __len__(self):
         if self.is_bottom():
             return 0
-        if isinstance(self.low, int) and isinstance(self.high, int):
-            return self.high - self.low
-        assert (self.is_infinite())
-        return sys.maxsize
+        elif self.is_infinite():
+            return inf_str_to_number(INF)
+        else:
+            assert isinstance(self.low.n, int) and isinstance(self.high.n, int)
+            return self.high.n - self.low.n
 
     def len_string(self):
         if self.is_infinite():
             return INF
         else:
-            return len(self)
+            return str(len(self))
 
 
 class IntervalSet:
 
     def __init__(self, intervals):
-        self.dict = {i.var: i for i in intervals if not i.is_top()}
+        self.dict = intervals
 
     def __str__(self):
         if self.is_top():
