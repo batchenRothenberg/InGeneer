@@ -70,14 +70,8 @@ def test_interval():
     print(I_4)
 
 
-def test_generalize(tr):
-    I = IntervalSet([])
-    I_1 = IntervalSet([Interval("x", 3, 7)])
-    #r = generalize(I, tr, interval_wp_step)
-    #print(r)
-    #r = generalize(I_1, tr, interval_wp_step())
-    #print(r)
-    wp_gen = WPGeneralizer(tr,simplification=Simplification.NONE)
+def test_wp_generalize(tr):
+    wp_gen = WPGeneralizer(tr, simplification=Simplification.NONE)
     r = wp_gen.generalize()
     print("Final result no simplification: ", r)
     wp_gen.set_simplification(Simplification.ONCE_AT_END)
@@ -88,13 +82,57 @@ def test_generalize(tr):
     print("Final result simplify after each step: ", r)
 
 
+def test_interval_intersection():
+    r = max_with_minf([MINF, -3, -7, MINF, MINF, -4])
+    print(r)
+    r = max_with_minf([MINF, MINF, MINF, MINF, MINF, MINF])
+    print(r)
+    r = min_with_inf([INF, -3, -7, INF, INF, -4])
+    print(r)
+    r = min_with_inf([INF, INF, INF, INF, INF, INF])
+    print(r)
+    r = interval_intersection([Interval("x", 3, 9), Interval("x", -2, 7), Interval("x", MINF, 3)])
+    print(r)
+    r = interval_intersection([Interval("x", MINF, 19), Interval("x", MINF, 17), Interval("x", MINF, 63)])
+    print(r)
+    r = interval_intersection([Interval("x", 33, INF), Interval("x", -22, INF), Interval("x", MINF, INF)])
+    print(r)
+    r = interval_intersection([Interval("x", 0, 6), Interval("x", 8, 60)])
+    print(r)
+    r = interval_intersection([Interval("x", 0, 6), Interval("x", 6, INF)])
+    print(r)
+
+
+def test_interval_generalize(tr):
+    x = Int('x')
+    y = Int('y')
+    z = Int('z')
+    c_1 = ConditionStmt(x + y >= 8)
+    a_1 = AssignmentStmt(z == x + y)
+    c_2 = ConditionStmt(x <= y)
+    c_3 = ConditionStmt(z >= 9)
+    a_2 = AssignmentStmt(z == z - 1)
+    c_4 = ConditionStmt(z <= 8)
+    tr2 = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
+    I = IntervalSet([])
+    I_1 = IntervalSet({"x": Interval(3, 7)})
+    ip_gen = IPGeneralizer(tr)
+    r = ip_gen.generalize()
+    print("Final result intervals no input: ", r)
+
+
+def test_generalize(tr):
+    test_wp_generalize(tr)
+    test_interval_generalize(tr)
+
+
 def main():
     x = Int('x')
     y = Int('y')
     z = Int('z')
     c_1 = ConditionStmt(x + y >= 8)
     a_1 = AssignmentStmt(z == x + y)
-    c_2 = ConditionStmt(x <= 0)
+    c_2 = ConditionStmt(x <= y)
     c_3 = ConditionStmt(z >= 9)
     a_2 = AssignmentStmt(z == z - 1)
     c_4 = ConditionStmt(z <= 8)
@@ -102,6 +140,8 @@ def main():
     # test_trace(tr)
     # test_interval()
     test_generalize(tr)
+    # test_interval_intersection()
+    # help_simplify()
 
 
 if __name__ == "__main__":
