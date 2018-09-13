@@ -1,6 +1,6 @@
 from generalizer import Generalizer
 from stmt import *
-from z3getvars import *
+from utils import *
 from interval import *
 
 class IPGeneralizer(Generalizer):

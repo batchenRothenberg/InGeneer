@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from z3 import *
 
 
@@ -59,3 +61,38 @@ def get_vars_and_coefficients(f):
 
 def negate_condition(cond):
     pass
+
+
+class TopologicalSort(ABC):
+
+    def __init__(self,root):
+        self.root = root
+
+    @abstractmethod
+    def get_children(self, node):
+        pass
+
+    @abstractmethod
+    def process(self, node):
+        pass
+
+    def _sort_aux(self, node, visited, res):
+        visited.append(node)
+        for child in self.get_children(node):
+            if child not in visited:
+                self._sort_aux(child, visited, res)
+        res.insert(0,self.process(node))
+
+    def sort(self):
+        """
+        Returns a topological sort of the graph beginning in root,
+        when all edges are reversed (i.e., root should be the last).
+        the children of each node in the graph are determined by @get_children_func(node).
+        :return: a list of node representations, ordered according to the topological sort found.
+        The representation of a node is determined by @process_func(node).
+        """
+        res = []
+        self._sort_aux(self.root, [], res)
+        return res
+
+

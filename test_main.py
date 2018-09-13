@@ -1,9 +1,12 @@
+from collections import defaultdict
+
 from wp_generalizer import *
 from ip_generalizer import *
 from z3 import *
 from interval import *
 from stmt import *
 from trace import *
+from utils import *
 
 
 def test_trace(tr):
@@ -126,6 +129,33 @@ def test_generalize(tr):
     test_interval_generalize(tr)
 
 
+def test_sort():
+    class Graph(TopologicalSort):
+        def __init__(self, root):
+            super().__init__(root)
+            self.graph = defaultdict(list)  # dictionary containing adjacency List
+
+        # function to add an edge to graph
+        def addEdge(self, u, v):
+            self.graph[u].append(v)
+
+        def get_children(self, node):
+            return self.graph[node]
+
+        def process(self, node):
+            return str(node)
+
+    g = Graph(1)
+    g.addEdge(2, 5)
+    g.addEdge(0, 5)
+    g.addEdge(0, 4)
+    g.addEdge(1, 4)
+    g.addEdge(3, 2)
+    g.addEdge(1, 3)
+    r = g.sort()
+    print("sort ",r)
+
+
 def main():
     x = Int('x')
     y = Int('y')
@@ -139,9 +169,10 @@ def main():
     tr = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
     # test_trace(tr)
     # test_interval()
-    test_generalize(tr)
+    # test_generalize(tr)
     # test_interval_intersection()
     # help_simplify()
+    test_sort()
 
 
 if __name__ == "__main__":
