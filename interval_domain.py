@@ -1,13 +1,10 @@
-from generalizer import Generalizer
+from domain import Domain
 from stmt import *
 from utils import *
 from interval import *
 
-class IPGeneralizer(Generalizer):
 
-    def __init__(self, trace, input=None, record_annotation=False, initial_formula=IntervalSet([])):
-        super().__init__(trace,record_annotation,initial_formula)
-        self.input = input
+class IntervalDomain(Domain):
 
     def do_step(self,I, st):
         print("doing interval w.p. step with ", I, " and ", st)
@@ -17,7 +14,7 @@ class IPGeneralizer(Generalizer):
             assert isinstance(st, ConditionStmt)
             cond = st.expr
             if is_and(cond):
-                return interval_intersection([interval_condition_pre_step(I, c) for c in cond.chidren()])
+                return Interval.intersection([interval_condition_pre_step(I, c) for c in cond.chidren()])
             elif is_or(cond):
                 # arbitrarily choose to satisfy the first disjunct
                 return interval_condition_pre_step(I, cond.arg(0))
@@ -27,6 +24,21 @@ class IPGeneralizer(Generalizer):
                 return interval_condition_pre_step(I, neg_cond)
             else:
                 return interval_condition_pre_step(I, cond)
+
+    def is_bottom(self, I):
+        return I.is_bottom()
+
+    def is_top(self, I):
+        return I.is_top()
+
+    def intersection(self, formulas):
+        return IntervalSet.intersection(formulas)
+
+    def get_top(self):
+        return IntervalSet.get_top()
+
+    def get_bottom(self):
+        return IntervalSet.get_bottom()
 
 
 def interval_assignment_pre_step(I, st):

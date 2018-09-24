@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from wp_generalizer import *
-from ip_generalizer import *
+from interval_domain import *
 from z3 import *
 from interval import *
 from stmt import *
@@ -111,21 +111,35 @@ def test_interval_generalize(tr):
     y = Int('y')
     z = Int('z')
     c_1 = ConditionStmt(x + y >= 8)
+    c_1_1 = ConditionStmt(x - y >= 8)
     a_1 = AssignmentStmt(z == x + y)
+    a_1_1 = AssignmentStmt(z == x - y)
     c_2 = ConditionStmt(x <= y)
     c_3 = ConditionStmt(z >= 9)
     a_2 = AssignmentStmt(z == z - 1)
     c_4 = ConditionStmt(z <= 8)
     tr2 = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
-    I = IntervalSet([])
+    multitrace2 = BackwardTrace([[c_1, c_1_1], [a_1, a_1_1], [c_2], [c_3], [a_2], [c_4]])
+    I = IntervalSet({"x": Interval(3, 7),"y": Interval(-3, 17)})
     I_1 = IntervalSet({"x": Interval(3, 7)})
-    ip_gen = IPGeneralizer(tr)
-    r = ip_gen.generalize()
-    print("Final result intervals no input: ", r)
-
+    interval_generalizer = Generalizer(IntervalDomain())
+    r = interval_generalizer.generalize_input(tr2, print_annotation=True)
+    print("Final result intervals input generalize from top: ", r, "\n")
+    r_1 = interval_generalizer.generalize_input(tr2, initial_formula=I, print_annotation=True)
+    print("Final result intervals input generalize from two intervals: ", r_1, "\n")
+    r_2 = interval_generalizer.generalize_input(tr2, initial_formula=I_1, print_annotation=True)
+    print("Final result intervals input generalize from one interval: ", r_2, "\n")
+    r = interval_generalizer.generalize_trace(multitrace2, print_annotation=True)
+    print("Final result intervals trace generalize from top: ", r, "\n")
+    r_1 = interval_generalizer.generalize_trace(multitrace2, initial_formula=I, print_annotation=True)
+    print("Final result intervals trace generalize from two intervals: ", r_1, "\n")
+    r_2 = interval_generalizer.generalize_trace(multitrace2, initial_formula=I_1, print_annotation=True)
+    print("Final result intervals trace generalize from one interval: ", r_2, "\n")
+    r_3 = interval_generalizer.generalize_trace(multitrace2, initial_formula=IntervalSet.get_bottom(), print_annotation=True)
+    print("Final result intervals trace generalize from bottom: ", r_3, "\n")
 
 def test_generalize(tr):
-    test_wp_generalize(tr)
+    # test_wp_generalize(tr)
     test_interval_generalize(tr)
 
 
@@ -169,10 +183,10 @@ def main():
     tr = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
     # test_trace(tr)
     # test_interval()
-    # test_generalize(tr)
+    test_generalize(tr)
     # test_interval_intersection()
     # help_simplify()
-    test_sort()
+    # test_sort()
 
 
 if __name__ == "__main__":

@@ -129,6 +129,18 @@ class IntervalBorder:
 
 class Interval:
 
+    # def __init__(self, low, high):
+    #     assert (isinstance(low, int) or isinstance(low, IntervalBorder) or low == MINF)
+    #     assert (isinstance(high, int) or isinstance(high, IntervalBorder) or high == INF)
+    #     if isinstance(low, IntervalBorder):
+    #         self.low = IntervalBorder(low.n)
+    #     else:
+    #         self.low = IntervalBorder(low)
+    #     if isinstance(high, IntervalBorder):
+    #         self.high = IntervalBorder(high.n)
+    #     else:
+    #         self.high = IntervalBorder(high)
+
     def __init__(self, low, high):
         assert (isinstance(low, int) or low == MINF)
         assert (isinstance(high, int) or high == INF)
@@ -169,6 +181,21 @@ class Interval:
         else:
             return str(len(self))
 
+    def intersect(self, other):
+        """
+        The result of the intersection of self and other is stored in self
+        :param other: another @Interval to perform intersection with
+        :return: None
+        """
+        pass
+
+    def intersection(intervals):
+        # max_low = max_with_minf([i.low for i in intervals])
+        max_low = max([i.low for i in intervals])
+        # min_high = min_with_inf([i.high for i in intervals])
+        min_high = min([i.high for i in intervals])
+        return Interval(max_low.n, min_high.n)
+
 
 class IntervalSet:
 
@@ -181,8 +208,9 @@ class IntervalSet:
         if self.is_bottom():
             return _UBOT
         res = ""
-        for v in self.dict.values():
-            res = res + str(v) + " "
+        for k in self.dict.keys():
+            v = self.dict[k]
+            res = res + str(k) + ":" + str(v) + " "
         return res
 
     def __repr__(self):
@@ -193,6 +221,33 @@ class IntervalSet:
 
     def is_bottom(self):
         return any([v.is_bottom() for v in self.dict.values()])
+
+    @staticmethod
+    def get_top():
+        return IntervalSet({})
+
+    @staticmethod
+    def get_bottom():
+        return IntervalSet({"bottom_var":Interval(4, 3)})
+
+    def intersect(self, other):
+        """
+        The result of the intersection of self and other is stored in self
+        :param other: another @IntervalSet to perform intersection with
+        :return: None
+        """
+        for var in other.dict.keys():
+            if var in self.dict.keys():
+                self.dict[var] = Interval.intersection([self.dict[var],other.dict[var]])
+            else:
+                self.dict[var] = other.dict[var]
+
+    @staticmethod
+    def intersection(intervalsets):
+        res = IntervalSet.get_top()
+        for intervalset in intervalsets:
+            res.intersect(intervalset)
+        return res
 
 
 def max_of_two_with_minf(n, m):
@@ -225,7 +280,7 @@ def min_of_two_with_inf(n, m):
         assert m == INF
         return n
     else:
-        assert isinstance(n, int) and isinstance(m, int)
+        # assert isinstance(n, int) and isinstance(m, int)
         if n < m:
             return n
         else:
@@ -238,8 +293,3 @@ def min_with_inf(numbers):
         min = min_of_two_with_inf(min, n)
     return min
 
-
-def interval_intersection(intervals):
-    max_low = max_with_minf([i.low for i in intervals])
-    min_high = min_with_inf([i.high for i in intervals])
-    return Interval("x", max_low, min_high)
