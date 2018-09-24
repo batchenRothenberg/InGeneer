@@ -1,18 +1,10 @@
-from generalizer import Generalizer
-from enum import Enum
 from stmt import *
+from domain import Domain
 
 
-class Simplification(Enum):
-    NONE = 1
-    ONCE_AT_END = 2
-    ALWAYS = 3
+class PreciseDomain(Domain):
 
-
-class WPGeneralizer(Generalizer):
-
-    def __init__(self, trace, record_annotation = False, simplification = Simplification.NONE, initial_formula=True):
-        super().__init__(trace,record_annotation,initial_formula)
+    def __init__(self, simplification = False):
         self.simplification = simplification
 
     def do_step(self, f, st):
@@ -28,15 +20,29 @@ class WPGeneralizer(Generalizer):
         else:
             assert (isinstance(st, ConditionStmt))
             wp = And(f, st.expr)
-        if self.simplification == Simplification.ALWAYS:
+        if self.simplification:
             wp = simplify(wp)
         return wp
 
-    def generalize(self):
-        r = super().generalize()
-        if self.simplification == Simplification.ONCE_AT_END:
-            r = simplify(r)
-        return r
-
     def set_simplification(self,simpl):
         self.simplification = simpl
+
+    def is_bottom(self, formula):
+        return is_false(formula)
+
+    def is_top(self, formula):
+        return is_true(formula)
+
+    def intersection(self, formulas):
+        if len(formulas) >= 2:
+            return And(formulas)
+        elif len(formulas) == 1:
+            return formulas[0]
+        else:
+            return PreciseDomain.get_top()
+
+    def get_top(self):
+        return True
+
+    def get_bottom(self):
+        return False

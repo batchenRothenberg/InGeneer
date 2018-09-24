@@ -1,12 +1,13 @@
 from collections import defaultdict
 
-from wp_generalizer import *
+from precise_domain import *
 from interval_domain import *
 from z3 import *
 from interval import *
 from stmt import *
 from trace import *
 from utils import *
+from generalizer import Generalizer
 
 
 def test_trace(tr):
@@ -74,16 +75,32 @@ def test_interval():
 
 
 def test_wp_generalize(tr):
-    wp_gen = WPGeneralizer(tr, simplification=Simplification.NONE)
-    r = wp_gen.generalize()
-    print("Final result no simplification: ", r)
-    wp_gen.set_simplification(Simplification.ONCE_AT_END)
-    r = wp_gen.generalize()
-    print("Final result simplify once at end: ", r)
-    wp_gen.set_simplification(Simplification.ALWAYS)
-    r = wp_gen.generalize()
-    print("Final result simplify after each step: ", r)
-
+    x = Int('x')
+    y = Int('y')
+    z = Int('z')
+    c_1 = ConditionStmt(x + y >= 8)
+    c_1_1 = ConditionStmt(x - y >= 8)
+    a_1 = AssignmentStmt(z == x + y)
+    a_1_1 = AssignmentStmt(z == x - y)
+    c_2 = ConditionStmt(x <= y)
+    c_3 = ConditionStmt(z >= 9)
+    a_2 = AssignmentStmt(z == z - 1)
+    c_4 = ConditionStmt(z <= 8)
+    multitrace = BackwardTrace([[c_1, c_1_1], [a_1, a_1_1], [c_2], [c_3], [a_2], [c_4]])
+    wp_gen_no_simpl = Generalizer(PreciseDomain(False))
+    wp_gen_with_simpl = Generalizer(PreciseDomain(True))
+    r = wp_gen_no_simpl.generalize_input(tr,print_annotation=True)
+    print("Final result generalize input from top no simplification: ", r, "\n")
+    simplify(r)
+    print("Final result generalize input from top simplify once at end: ", r, "\n")
+    r = wp_gen_with_simpl.generalize_input(tr,print_annotation=True)
+    print("Final result generalize input from top simplify after each step: ", r, "\n")
+    r = wp_gen_no_simpl.generalize_trace(multitrace,print_annotation=True)
+    print("Final result generalize trace from top no simplification: ", r, "\n")
+    r = wp_gen_with_simpl.generalize_trace(multitrace, print_annotation=True)
+    print("Final result generalize trace from top simplify after each step: ", r, "\n")
+    r = wp_gen_no_simpl.generalize_trace(multitrace, initial_formula=PreciseDomain().get_bottom(), print_annotation=True)
+    print("Final result generalize trace from bottom no simplification: ", r, "\n")
 
 def test_interval_intersection():
     r = max_with_minf([MINF, -3, -7, MINF, MINF, -4])
@@ -139,7 +156,7 @@ def test_interval_generalize(tr):
     print("Final result intervals trace generalize from bottom: ", r_3, "\n")
 
 def test_generalize(tr):
-    # test_wp_generalize(tr)
+    test_wp_generalize(tr)
     test_interval_generalize(tr)
 
 
