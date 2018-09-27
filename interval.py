@@ -181,18 +181,9 @@ class Interval:
         else:
             return str(len(self))
 
-    def intersect(self, other):
-        """
-        The result of the intersection of self and other is stored in self
-        :param other: another @Interval to perform intersection with
-        :return: None
-        """
-        pass
-
+    @staticmethod
     def intersection(intervals):
-        # max_low = max_with_minf([i.low for i in intervals])
         max_low = max([i.low for i in intervals])
-        # min_high = min_with_inf([i.high for i in intervals])
         min_high = min([i.high for i in intervals])
         return Interval(max_low.n, min_high.n)
 
