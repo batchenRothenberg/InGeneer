@@ -42,7 +42,7 @@ class PreciseDomain(Domain):
             return PreciseDomain.get_top()
 
     def get_top(self):
-        return True
+        return BoolVal(True)
 
     def get_bottom(self):
-        return False
+        return BoolVal(False)
