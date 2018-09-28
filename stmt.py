@@ -31,7 +31,7 @@ class AssignmentStmt(Stmt):
         assert (is_eq(expr))
         self.lhs = expr.arg(0)
         self.rhs = expr.arg(1)
-        super().__init__(expr)
+        super(AssignmentStmt, self).__init__(expr)
 
     def __str__(self):
         return self.lhs.__str__() + " := " + self.rhs.__str__()
@@ -55,7 +55,7 @@ class ConditionStmt(Stmt):
         if expr.num_args() < 2:
             print("error")
         self.op = expr.decl()
-        super().__init__(expr)
+        super(ConditionStmt, self).__init__(expr)
 
     def __str__(self):
         return "[[" + self.expr.__str__() + "]]"
