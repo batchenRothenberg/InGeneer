@@ -8,10 +8,10 @@ class IntervalDomain(Domain):
 
     def do_step(self,I, st):
         print("doing interval w.p. step with ", I, " and ", st)
-        if isinstance(st, AssignmentStmt):
+        if st.is_assignment():
             return interval_assignment_pre_step(I, st)
         else:
-            assert isinstance(st, ConditionStmt)
+            assert st.is_condition()
             cond = st.expr
             if is_and(cond):
                 return Interval.intersection([interval_condition_pre_step(I, c) for c in cond.chidren()])

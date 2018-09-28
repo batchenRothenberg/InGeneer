@@ -9,7 +9,7 @@ class PreciseDomain(Domain):
 
     def do_step(self, f, st):
         print("doing precise w.p. step with ", f, " and ", st)
-        if isinstance(st, AssignmentStmt):
+        if st.is_assignment():
             weakest_precondition_goal = Goal()
             fresh_var = Const(str(st.lhs) + "'", st.lhs.sort())
             new_f = substitute(f, [(st.lhs, fresh_var)])
@@ -18,7 +18,7 @@ class PreciseDomain(Domain):
             t = Tactic('qe')  # quantifier elimination
             wp = t(weakest_precondition_goal).as_expr()
         else:
-            assert (isinstance(st, ConditionStmt))
+            assert (st.is_condition())
             wp = And(f, st.expr)
         if self.simplification:
             wp = simplify(wp)
