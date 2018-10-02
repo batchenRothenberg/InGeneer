@@ -4,13 +4,13 @@ class Generalizer:
     def __init__(self, domain):
         self.domain = domain
         self.annotation = []
-        self.safe_statements_set = {}
+        self.safe_statements_set = set()
 
     def generalize_input(self, trace, initial_formula="default", record_annotation=False, print_annotation=False):
         return self._generalize(trace, initial_formula, self.domain.do_step, record_annotation, print_annotation)
 
     def generalize_trace(self, multitrace, initial_formula="default", record_annotation=False, print_annotation=False):
-        self.safe_statements_set = {}
+        self.safe_statements_set = set()
         self._generalize(multitrace, initial_formula, self.do_group_step, record_annotation, print_annotation)
         return self.safe_statements_set
 
