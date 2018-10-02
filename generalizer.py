@@ -15,7 +15,7 @@ class Generalizer:
         return self.selected_multitrace
 
     def _generalize(self, abstract_trace, initial_formula, step_function, record_annotation, print_annotation):
-        if initial_formula == "default":
+        if str(initial_formula) == "default":
             initial_formula = self.domain.get_top()
         formula = initial_formula
         if print_annotation:
