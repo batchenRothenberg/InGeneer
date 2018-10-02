@@ -1,7 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 
-class Trace(ABC):
+class Trace():
+    __metaclass__ = ABCMeta
 
     def __init__(self,tr):
         self.trace = tr
@@ -26,11 +27,14 @@ class Trace(ABC):
     def __next__(self):
         pass
 
+    def next(self):
+        return self.__next__()
+
 
 class ForwardTrace(Trace):
 
     def __init__(self,tr):
-        super().__init__(tr)
+        super(ForwardTrace, self).__init__(tr)
         self.curr = 1
 
     def __str__(self):
@@ -53,7 +57,7 @@ class ForwardTrace(Trace):
 class BackwardTrace(Trace):
 
     def __init__(self,tr):
-        super().__init__(tr)
+        super(BackwardTrace, self).__init__(tr)
         self.curr = len(tr)
 
     def __str__(self):
