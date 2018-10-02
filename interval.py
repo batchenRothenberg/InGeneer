@@ -4,10 +4,10 @@ MINF = "minf"
 INF = "inf"
 MAXINT = sys.maxsize
 MININT = -sys.maxsize - 1
-_UBOT = u'\u27D8'
-_UTOP = u'\u27D9'
-_UINF = u'\u221E'
-_UIN = u'\u220A'
+_UBOT = u'\u27d8'.encode("utf-8")
+_UTOP = u'\u27d9'.encode("utf-8")
+_UINF = u'\u221E'.encode("utf-8")
+_UIN = u'\u220A'.encode("utf-8")
 
 
 def inf_str_to_number(st):
