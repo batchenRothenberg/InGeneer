@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 from z3 import *
 
@@ -63,7 +63,8 @@ def negate_condition(cond):
     pass
 
 
-class TopologicalSort(ABC):
+class TopologicalSort():
+    __metaclass__ = ABCMeta
 
     def __init__(self,root):
         self.root = root
