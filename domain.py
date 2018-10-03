@@ -27,3 +27,12 @@ class Domain:
     @abstractmethod
     def get_bottom(self):
         pass
+
+    @abstractmethod
+    def choose(self, formulas):
+        """Sould split the indices of formulas list (0...len(formulas)-1) into two lists:
+        chosen indices - a list of indices of all formulas that are chosen.
+        unchosen indices - a list of indices of all formulas that are left out.
+        Both lists should be returned as a tuple (chosen_indices,unchosen_indices).
+        """
+        pass

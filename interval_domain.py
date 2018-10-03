@@ -40,6 +40,16 @@ class IntervalDomain(Domain):
     def get_bottom(self):
         return IntervalSet.get_bottom()
 
+    def choose(self, formulas):
+        chosen_indices = []
+        unchosen_indices = []
+        for i in range(len(formulas)):
+            if self.is_bottom(formulas[i]):
+                unchosen_indices.append(i)
+            else:
+                chosen_indices.append(i)
+        return chosen_indices, unchosen_indices
+
 
 def interval_assignment_pre_step(I, st):
     return I

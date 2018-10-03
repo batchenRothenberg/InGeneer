@@ -37,10 +37,11 @@ class Generalizer:
         formulas = []
         for stmt in group:
             formula_i = self.domain.do_step(formula,stmt)
-            if self.domain.is_bottom(formula_i):
-                self.safe_statements_set.add(stmt)
-            else:
-                formulas.append(formula_i)
-        if formulas == []:
+            formulas.append(formula_i)
+        chosen_indices, unchosen_indices = self.domain.choose(formulas)
+        chosen_formulas = [formulas[i] for i in chosen_indices]
+        unselected_stmts = [group[i] for i in unchosen_indices]
+        self.safe_statements_set.update(unselected_stmts)
+        if chosen_formulas == []:
             return self.domain.get_bottom()
-        return self.domain.intersection(formulas)
+        return self.domain.intersection(chosen_formulas)
