@@ -187,6 +187,12 @@ class Interval:
         min_high = min([i.high for i in intervals])
         return Interval(max_low.n, min_high.n)
 
+    def __eq__(self, other):
+        return self.low == other.low and self.high == other.high
+
+    def __ne__(self, other):
+        return not __eq__(self, other)
+
 
 class IntervalSet:
 
@@ -239,6 +245,12 @@ class IntervalSet:
         for intervalset in intervalsets:
             res.intersect(intervalset)
         return res
+
+    def __eq__(self, other):
+        return self.dict == other.dict
+
+    def __ne__(self, other):
+        return not __eq__(self, other)
 
 
 def max_of_two_with_minf(n, m):
