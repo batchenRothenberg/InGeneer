@@ -9,6 +9,38 @@ from trace import *
 from utils import *
 from generalizer import Generalizer
 
+x = Int('x')
+y = Int('y')
+z = Int('z')
+c_1_0 = ConditionStmt(x + y >= 8)
+c_1_1 = ConditionStmt(x - y >= 8)
+c_1_2 = ConditionStmt(x + y > 8)
+c_1_3 = ConditionStmt(x + y < 8)
+a_1_0 = AssignmentStmt(z == x + y)
+a_1_1 = AssignmentStmt(z == x - y)
+c_2_0 = ConditionStmt(x >= 0)
+c_2_1 = ConditionStmt(x > 0)
+c_2_2 = ConditionStmt(x < 0)
+c_3_0 = ConditionStmt(z >= 9)
+c_3_1 = ConditionStmt(z > 9)
+c_3_2 = ConditionStmt(z < 9)
+a_2_0 = AssignmentStmt(z == z - 1)
+a_2_1 = AssignmentStmt(z == z + 1)
+c_4_0 = ConditionStmt(z <= 8)
+a_3_0 = AssignmentStmt(z == 9)
+a_4_0 = AssignmentStmt(x == x - 1)
+a_4_1 = AssignmentStmt(x == x + 1)
+a_5_0 = AssignmentStmt(z == z + 3)
+a_5_1 = AssignmentStmt(z == z - 3)
+tr_TFT = BackwardTrace([c_1_0, a_1_0, c_2_2, c_3_0, a_2_0, c_4_0])
+mt_TFT = BackwardTrace([[c_1_0, c_1_1, c_1_2, c_1_3], [a_1_0, a_1_1], [c_2_0,c_2_1,c_2_2], [c_3_0,c_3_1,c_3_2], [a_2_0,a_2_1], [c_4_0]])
+
+I = IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17)})
+I_1 = IntervalSet({"x": Interval(3, 7)})
+interval_domain = IntervalDomain()
+interval_generalizer = Generalizer(interval_domain)
+wp_domain = PreciseDomain()
+wp_generalizer = Generalizer(wp_domain)
 
 def test_trace(tr):
     print("Forward:")
@@ -123,42 +155,56 @@ def test_interval_intersection():
     print(r)
 
 
-def test_interval_generalize(tr):
-    x = Int('x')
-    y = Int('y')
-    z = Int('z')
-    c_1 = ConditionStmt(x + y >= 8)
-    c_1_1 = ConditionStmt(x - y >= 8)
-    a_1 = AssignmentStmt(z == x + y)
-    a_1_1 = AssignmentStmt(z == x - y)
-    c_2 = ConditionStmt(x <= y)
-    c_3 = ConditionStmt(z >= 9)
-    a_2 = AssignmentStmt(z == z - 1)
-    c_4 = ConditionStmt(z <= 8)
-    tr2 = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
-    multitrace2 = BackwardTrace([[c_1, c_1_1], [a_1, a_1_1], [c_2], [c_3], [a_2], [c_4]])
-    I = IntervalSet({"x": Interval(3, 7),"y": Interval(-3, 17)})
-    I_1 = IntervalSet({"x": Interval(3, 7)})
-    interval_generalizer = Generalizer(IntervalDomain())
-    r = interval_generalizer.generalize_input(tr2, print_annotation=True)
-    print("Final result intervals input generalize from top: ", r, "\n")
-    r_1 = interval_generalizer.generalize_input(tr2, initial_formula=I, print_annotation=True)
-    print("Final result intervals input generalize from two intervals: ", r_1, "\n")
-    r_2 = interval_generalizer.generalize_input(tr2, initial_formula=I_1, print_annotation=True)
-    print("Final result intervals input generalize from one interval: ", r_2, "\n")
-    r = interval_generalizer.generalize_trace(multitrace2, print_annotation=True)
-    print("Final result intervals trace generalize from top: ", r, "\n")
-    r_1 = interval_generalizer.generalize_trace(multitrace2, initial_formula=I, print_annotation=True)
-    print("Final result intervals trace generalize from two intervals: ", r_1, "\n")
-    r_2 = interval_generalizer.generalize_trace(multitrace2, initial_formula=I_1, print_annotation=True)
-    print("Final result intervals trace generalize from one interval: ", r_2, "\n")
-    r_3 = interval_generalizer.generalize_trace(multitrace2, initial_formula=IntervalSet.get_bottom(), print_annotation=True)
-    print("Final result intervals trace generalize from bottom: ", r_3, "\n")
+def test_generalize():
+    test_wp_generalize_trace()
+    test_wp_generalize_input()
+    test_interval_generalize_trace()
+    test_interval_generalize_input()
 
-def test_generalize(tr):
-    test_wp_generalize(tr)
-    test_interval_generalize(tr)
+def test_wp_generalize_trace():
+    r = wp_generalizer.generalize_trace(mt_TFT, print_annotation=True)
+    print(r)
+    r_1 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=x>8, record_annotation=True, print_annotation=True)
+    print(r_1)
+    r_2 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=y>8, print_annotation=True, record_annotation=True)
+    print(r_2)
+    r_3 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=wp_domain.get_bottom())
+    print(r_3)
+    print("SUCCESS: test_wp_generalize_trace")
 
+def test_wp_generalize_input():
+    r = wp_generalizer.generalize_input(tr_TFT, print_annotation=True)
+    print(r)
+    r_1 = wp_generalizer.generalize_input(tr_TFT, initial_formula=x > 8, record_annotation=True, print_annotation=True)
+    print(r_1)
+    r_2 = wp_generalizer.generalize_input(tr_TFT, initial_formula=y > 8, print_annotation=True, record_annotation=True)
+    print(r_2)
+    r_3 = wp_generalizer.generalize_input(tr_TFT, initial_formula=wp_domain.get_bottom())
+    print(r_3)
+    print("SUCCESS: test_wp_generalize_input")
+
+def test_interval_generalize_trace():
+    r = interval_generalizer.generalize_trace(mt_TFT, print_annotation=True)
+    assert len(r)==0
+    r_1 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I, record_annotation=True)
+    assert len(r_1)==0
+    r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, print_annotation=True,
+                                                record_annotation=True)
+    assert len(r_2)==0
+    r_3 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=interval_domain.get_bottom())
+    assert len(r_3)==len(set([item for sublist in mt_TFT for item in sublist]))
+    print("SUCCESS: test_interval_generalize_trace")
+
+def test_interval_generalize_input():
+    r = interval_generalizer.generalize_input(tr_TFT,print_annotation=True)
+    assert interval_domain.is_top(r)
+    r_1 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I, record_annotation=True)
+    assert r_1 == I
+    r_2 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I_1,print_annotation=True, record_annotation=True)
+    assert r_2 == I_1
+    r_3 = interval_generalizer.generalize_input(tr_TFT, initial_formula=interval_domain.get_bottom())
+    assert interval_domain.is_bottom(r_3)
+    print("SUCCESS: test_interval_generalize_input")
 
 def test_sort():
     class Graph(TopologicalSort):
@@ -200,7 +246,7 @@ def main():
     tr = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
     # test_trace(tr)
     # test_interval()
-    test_generalize(tr)
+    test_generalize()
     # test_interval_intersection()
     # help_simplify()
     # test_sort()
