@@ -7,7 +7,6 @@ from interval import *
 class IntervalDomain(Domain):
 
     def do_step(self,I, st):
-        print("doing interval w.p. step with ", I, " and ", st)
         if st.is_assignment():
             return interval_assignment_pre_step(I, st)
         else:

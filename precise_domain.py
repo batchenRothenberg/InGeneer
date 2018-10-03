@@ -8,7 +8,6 @@ class PreciseDomain(Domain):
         self.simplification = simplification
 
     def do_step(self, f, st):
-        print("doing precise w.p. step with ", f, " and ", st)
         if st.is_assignment():
             weakest_precondition_goal = Goal()
             fresh_var = Const(str(st.lhs) + "'", st.lhs.sort())
