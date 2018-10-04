@@ -6,15 +6,15 @@ class Generalizer:
         self.annotation = []
         self.safe_statements_set = set()
 
-    def generalize_input(self, trace, initial_formula="default", record_annotation=False, print_annotation=False):
-        return self._generalize(trace, initial_formula, self.domain.do_step, record_annotation, print_annotation)
+    def generalize_input(self, trace, initial_formula="default", model = None, record_annotation=False, print_annotation=False):
+        return self._generalize(trace, initial_formula, model, self.domain.do_step, record_annotation, print_annotation)
 
-    def generalize_trace(self, multitrace, initial_formula="default", record_annotation=False, print_annotation=False):
+    def generalize_trace(self, multitrace, initial_formula="default", model = None, record_annotation=False, print_annotation=False):
         self.safe_statements_set = set()
-        self._generalize(multitrace, initial_formula, self.do_group_step, record_annotation, print_annotation)
+        self._generalize(multitrace, initial_formula, model, self.do_group_step, record_annotation, print_annotation)
         return self.safe_statements_set
 
-    def _generalize(self, abstract_trace, initial_formula, step_function, record_annotation, print_annotation):
+    def _generalize(self, abstract_trace, initial_formula, model, step_function, record_annotation, print_annotation):
         if str(initial_formula) == "default":
             initial_formula = self.domain.get_top()
         formula = initial_formula
@@ -25,7 +25,7 @@ class Generalizer:
         for stmt in abstract_trace:
             if print_annotation:
                 print("Doing generalization step with "+str(stmt))
-            formula = step_function(formula,stmt)
+            formula = step_function(formula,stmt, model)
             if print_annotation:
                 print(formula)
             if record_annotation:
@@ -35,12 +35,12 @@ class Generalizer:
     def get_annotation(self):
         return self.annotation
 
-    def do_group_step(self, formula, group):
+    def do_group_step(self, formula, group, model):
         formulas = []
         for stmt in group:
-            formula_i = self.domain.do_step(formula,stmt)
+            formula_i = self.domain.do_step(formula,stmt, model)
             formulas.append(formula_i)
-        chosen_indices, unchosen_indices = self.domain.choose(formulas)
+        chosen_indices, unchosen_indices = self.domain.choose(formulas, model)
         chosen_formulas = [formulas[i] for i in chosen_indices]
         unselected_stmts = [group[i] for i in unchosen_indices]
         self.safe_statements_set.update(unselected_stmts)

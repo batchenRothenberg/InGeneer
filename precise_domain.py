@@ -7,7 +7,7 @@ class PreciseDomain(Domain):
     def __init__(self, simplification = False):
         self.simplification = simplification
 
-    def do_step(self, f, st):
+    def do_step(self, f, st, model):
         if st.is_assignment():
             new_f = substitute(f, [(st.lhs, st.rhs)])
             wp = new_f
@@ -41,7 +41,7 @@ class PreciseDomain(Domain):
     def get_bottom(self):
         return BoolVal(False)
 
-    def choose(self, formulas):
+    def choose(self, formulas, model):
         chosen_indices = []
         unchosen_indices = []
         for i in range(len(formulas)):

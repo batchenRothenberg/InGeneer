@@ -6,7 +6,7 @@ from interval import *
 
 class IntervalDomain(Domain):
 
-    def do_step(self,I, st):
+    def do_step(self,I, st, model):
         if st.is_assignment():
             return interval_assignment_pre_step(I, st)
         else:
@@ -39,7 +39,7 @@ class IntervalDomain(Domain):
     def get_bottom(self):
         return IntervalSet.get_bottom()
 
-    def choose(self, formulas):
+    def choose(self, formulas, model):
         chosen_indices = []
         unchosen_indices = []
         for i in range(len(formulas)):

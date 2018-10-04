@@ -5,7 +5,7 @@ class Domain:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def do_step(self, formula, stmt):
+    def do_step(self, formula, stmt, model):
         pass
 
     @abstractmethod
@@ -29,7 +29,7 @@ class Domain:
         pass
 
     @abstractmethod
-    def choose(self, formulas):
+    def choose(self, formulas, model):
         """Sould split the indices of formulas list (0...len(formulas)-1) into two lists:
         chosen indices - a list of indices of all formulas that are chosen.
         unchosen indices - a list of indices of all formulas that are left out.
