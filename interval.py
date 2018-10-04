@@ -188,6 +188,9 @@ class Interval:
         return Interval(max_low.n, min_high.n)
 
     def __eq__(self, other):
+        assert isinstance(other, Interval)
+        if self.is_bottom() and other.is_bottom():
+            return True
         return self.low == other.low and self.high == other.high
 
     def __ne__(self, other):
