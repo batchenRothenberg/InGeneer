@@ -183,14 +183,26 @@ def test_generalize():
     test_interval_generalize_input()
 
 def test_wp_generalize_trace():
-    r = wp_generalizer.generalize_trace(mt_TFT, print_annotation=True)
+    # NO SIMPLIFICATION
+    r = wp_generalizer.generalize_trace(mt_TFT, print_annotation=False)
     print(r)
-    r_1 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=x>8, record_annotation=True, print_annotation=True)
+    r_1 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=x>8, record_annotation=True, print_annotation=False)
     print(r_1)
-    r_2 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=y>8, print_annotation=True, record_annotation=True)
+    r_2 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=y>8, record_annotation=True, print_annotation=False)
     print(r_2)
     r_3 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=wp_domain.get_bottom())
     print(r_3)
+    # SIMPLIFICATION
+    wp_domain.set_simplification(True)
+    r = wp_generalizer.generalize_trace(mt_TFT, print_annotation=False)
+    print(r)
+    r_1 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=x>8, record_annotation=True, print_annotation=False)
+    print(r_1)
+    r_2 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=y>8, record_annotation=True, print_annotation=False)
+    print(r_2)
+    r_3 = wp_generalizer.generalize_trace(mt_TFT, initial_formula=wp_domain.get_bottom())
+    print(r_3)
+    wp_domain.set_simplification(False)
     print("SUCCESS: test_wp_generalize_trace")
 
 def test_wp_generalize_input():
@@ -224,7 +236,7 @@ def test_interval_generalize_trace():
     r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, print_annotation=True, record_annotation=True)
     assert len(r_2)==0
     r_3 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=interval_domain.get_bottom())
-    assert len(r_3)==len(set([item for sublist in mt_TFT for item in sublist]))
+    assert len(r_3)==0
     print("SUCCESS: test_interval_generalize_trace")
 
 def test_interval_generalize_input():
@@ -266,8 +278,8 @@ def test_sort():
 
 
 def main():
-    test_interval()
-    test_interval_set()
+    # test_interval()
+    # test_interval_set()
     test_generalize()
     # test_interval_intersection()
     # help_simplify()
