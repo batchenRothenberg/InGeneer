@@ -194,7 +194,7 @@ class Interval:
         return self.low == other.low and self.high == other.high
 
     def __ne__(self, other):
-        return not __eq__(self, other)
+        return not self == other
 
 
 class IntervalSet:
