@@ -24,6 +24,9 @@ class IntervalDomain(Domain):
             else:
                 return interval_condition_pre_step(I, cond)
 
+    def check_sat(self, formula, stmt, model):
+        return True
+
     def is_bottom(self, I):
         return I.is_bottom()
 

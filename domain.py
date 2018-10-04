@@ -9,6 +9,10 @@ class Domain:
         pass
 
     @abstractmethod
+    def check_sat(self, formula, stmt, model):
+        pass
+
+    @abstractmethod
     def is_bottom(self, formula):
         pass
 

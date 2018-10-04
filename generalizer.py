@@ -38,7 +38,10 @@ class Generalizer:
     def do_group_step(self, formula, group, model):
         formulas = []
         for stmt in group:
-            formula_i = self.domain.do_step(formula,stmt, model)
+            if self.domain.check_sat(formula, stmt, model):
+                formula_i = self.domain.do_step(formula,stmt, model)
+            else:
+                formula_i = self.domain.get_bottom()
             formulas.append(formula_i)
         chosen_indices, unchosen_indices = self.domain.choose(formulas, model)
         chosen_formulas = [formulas[i] for i in chosen_indices]

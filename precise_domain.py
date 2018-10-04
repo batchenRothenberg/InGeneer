@@ -18,6 +18,9 @@ class PreciseDomain(Domain):
             wp = simplify_and_propagate_ineqs(wp)
         return wp
 
+    def check_sat(self, formula, stmt, model):
+        return True
+
     def set_simplification(self,simpl):
         self.simplification = simpl
 
