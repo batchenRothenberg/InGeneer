@@ -25,6 +25,7 @@ class IntervalDomain(Domain):
                 return interval_condition_pre_step(I, cond)
 
     def check_sat(self, formula, stmt, model):
+        # todo: IMPLEMENT!
         return True
 
     def is_bottom(self, I):
@@ -43,13 +44,8 @@ class IntervalDomain(Domain):
         return IntervalSet.get_bottom()
 
     def choose(self, formulas, model):
-        chosen_indices = []
+        chosen_indices = [i for i in range(len(formulas))]
         unchosen_indices = []
-        for i in range(len(formulas)):
-            if self.is_bottom(formulas[i]):
-                unchosen_indices.append(i)
-            else:
-                chosen_indices.append(i)
         return chosen_indices, unchosen_indices
 
 
