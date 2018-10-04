@@ -41,6 +41,8 @@ class Generalizer:
             if self.domain.check_sat(formula, stmt, model):
                 formula_i = self.domain.do_step(formula,stmt, model)
                 formulas.append(formula_i)
+            else:
+                self.safe_statements_set.add(stmt)
         chosen_indices, unchosen_indices = self.domain.choose(formulas, model)
         chosen_formulas = [formulas[i] for i in chosen_indices]
         unselected_stmts = [group[i] for i in unchosen_indices]
