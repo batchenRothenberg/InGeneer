@@ -42,69 +42,90 @@ interval_generalizer = Generalizer(interval_domain)
 wp_domain = PreciseDomain()
 wp_generalizer = Generalizer(wp_domain)
 
-def test_trace(tr):
-    print("Forward:")
-    print(tr)
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    print("Backward:")
-    tr = BackwardTrace(tr.get_trace())
-    print(tr)
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-    tr.do_step()
-    print(tr.get_curr())
-
 
 def test_interval():
-    i_1 = Interval("x", 3, 5)
-    i_2 = Interval("y", -2, 6)
-    i_3 = Interval("var", "minf", "inf")
-    i_4 = Interval("x", "minf", 7)
-    i_5 = Interval("x", -5, "inf")
-    i_6 = Interval("x", -5, -10)
-    print(i_1,i_2,i_3)
-    print(i_4,i_5,i_6)
-    print("is_bottom:",i_1.is_bottom(),i_2.is_bottom(),i_3.is_bottom(),i_4.is_bottom(),i_5.is_bottom(),i_6.is_bottom())
-    print("is_top:",i_1.is_top(),i_2.is_top(),i_3.is_top(),i_4.is_top(),i_5.is_top(),i_6.is_top())
-    print("len:",len(i_1),len(i_2),len(i_3),len(i_4),len(i_5),len(i_6))
-    I_1 = IntervalSet([i_1,i_2,i_3])
-    print(I_1)
-    I_2 = IntervalSet([])
-    print(I_2)
-    I_3 = IntervalSet([i_2,i_3,i_6])
-    print(I_3)
-    I_4 = IntervalSet([i_1,i_2,i_3,i_4])
-    print(I_4)
+    i_1 = Interval(3, 5)
+    i_2 = Interval(-2, 6)
+    i_3 = Interval("minf", "inf")
+    i_4 = Interval("minf", 7)
+    i_5 = Interval(-5, "inf")
+    i_6 = Interval(-5, -10)
+    i_7 = Interval(5, 0)
+    assert not i_1.is_bottom()
+    assert not i_2.is_bottom()
+    assert not i_3.is_bottom()
+    assert not i_4.is_bottom()
+    assert not i_5.is_bottom()
+    assert i_6.is_bottom()
+    assert i_7.is_bottom()
+    assert not i_1.is_top()
+    assert not i_2.is_top()
+    assert i_3.is_top()
+    assert not i_4.is_top()
+    assert not i_5.is_top()
+    assert not i_6.is_top()
+    assert not i_7.is_top()
+    assert len(i_1) == 2
+    assert len(i_2) == 8
+    assert len(i_3) == MAXINT
+    assert len(i_4) == MAXINT
+    assert len(i_5) == MAXINT
+    assert len(i_6) == 0
+    assert len(i_7) == 0
+    assert i_1.len_string() == "2"
+    assert i_2.len_string() == "8"
+    assert i_3.len_string() == INF
+    assert i_4.len_string() == INF
+    assert i_5.len_string() == INF
+    assert i_6.len_string() == "0"
+    assert i_7.len_string() == "0"
+    assert not i_1.is_infinite()
+    assert not i_2.is_infinite()
+    assert i_3.is_infinite()
+    assert i_4.is_infinite()
+    assert i_5.is_infinite()
+    assert not i_6.is_infinite()
+    assert not i_7.is_infinite()
+    assert i_6 == i_7
+    assert i_2 == i_2
+    assert i_4 == i_4
+    assert i_1 != i_2
+    assert i_3 != i_4
+    assert i_3 != i_6
+    assert Interval.intersection([i_1,i_2]) == i_1
+    assert i_1 == Interval.intersection([i_1,i_2])
+    assert Interval.intersection([i_6, i_7]) == i_6
+    assert Interval.intersection([i_6, i_7]) == i_7
+    assert Interval.intersection([i_6, i_1]) == i_6
+    assert Interval.intersection([i_4, i_7]) == i_6
+    assert Interval.intersection([i_1, i_2, i_3]) == i_1
+    assert Interval.intersection([i_4, i_6, i_1]) == i_6
+    assert Interval.intersection([i_2, i_3, i_5]) == i_2
+    assert Interval.intersection([i_2]) == i_2
+    assert Interval.intersection([i_6]) == i_6
+    i_8 = Interval(-1, 4)
+    i_9 = Interval(4, 8)
+    assert Interval.intersection([i_1, i_8]) == Interval(3,4)
+    assert Interval.intersection([i_9, i_1]) == Interval(4,5)
+    assert Interval.intersection([i_9, i_1, i_8]) == Interval(4,4)
+    assert Interval.intersection([i_9, i_1, i_8, i_4]) == Interval(4,4)
+    i_10 = Interval(-10,-2)
+    assert Interval.intersection([i_10, i_8]) == Interval(-1,-2)
+    assert Interval.intersection([i_10, i_8]) == i_6
+    assert Interval.intersection([i_10, i_8, i_2, i_3, i_1]) == i_6
+    print("SUCCESS: test_interval")
 
+def test_interval_set():
+    # todo: Add TEST
+    # I_1 = IntervalSet([i_1,i_2,i_3])
+    # print(I_1)
+    # I_2 = IntervalSet([])
+    # print(I_2)
+    # I_3 = IntervalSet([i_2,i_3,i_6])
+    # print(I_3)
+    # I_4 = IntervalSet([i_1,i_2,i_3,i_4])
+    # print(I_4)
+    pass
 
 def test_wp_generalize(tr):
     x = Int('x')
@@ -173,14 +194,26 @@ def test_wp_generalize_trace():
     print("SUCCESS: test_wp_generalize_trace")
 
 def test_wp_generalize_input():
+    # NO SIMPLIFICATION
     r = wp_generalizer.generalize_input(tr_TFT, print_annotation=True)
     print(r)
     r_1 = wp_generalizer.generalize_input(tr_TFT, initial_formula=x > 8, record_annotation=True, print_annotation=True)
     print(r_1)
     r_2 = wp_generalizer.generalize_input(tr_TFT, initial_formula=y > 8, print_annotation=True, record_annotation=True)
     print(r_2)
-    r_3 = wp_generalizer.generalize_input(tr_TFT, initial_formula=wp_domain.get_bottom())
+    r_3 = wp_generalizer.generalize_input(tr_TFT, initial_formula=wp_domain.get_bottom(), print_annotation=True)
     print(r_3)
+    # WITH SIMPLIFICATION
+    wp_domain.set_simplification(True)
+    r = wp_generalizer.generalize_input(tr_TFT, print_annotation=True)
+    print(r)
+    r_1 = wp_generalizer.generalize_input(tr_TFT, initial_formula=x > 8, record_annotation=True, print_annotation=True)
+    print(r_1)
+    r_2 = wp_generalizer.generalize_input(tr_TFT, initial_formula=y > 8, print_annotation=True, record_annotation=True)
+    print(r_2)
+    r_3 = wp_generalizer.generalize_input(tr_TFT, initial_formula=wp_domain.get_bottom(), print_annotation=True)
+    print(r_3)
+    wp_domain.set_simplification(False)
     print("SUCCESS: test_wp_generalize_input")
 
 def test_interval_generalize_trace():
@@ -188,8 +221,7 @@ def test_interval_generalize_trace():
     assert len(r)==0
     r_1 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I, record_annotation=True)
     assert len(r_1)==0
-    r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, print_annotation=True,
-                                                record_annotation=True)
+    r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, print_annotation=True, record_annotation=True)
     assert len(r_2)==0
     r_3 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=interval_domain.get_bottom())
     assert len(r_3)==len(set([item for sublist in mt_TFT for item in sublist]))
@@ -234,18 +266,8 @@ def test_sort():
 
 
 def main():
-    x = Int('x')
-    y = Int('y')
-    z = Int('z')
-    c_1 = ConditionStmt(x + y >= 8)
-    a_1 = AssignmentStmt(z == x + y)
-    c_2 = ConditionStmt(x <= y)
-    c_3 = ConditionStmt(z >= 9)
-    a_2 = AssignmentStmt(z == z - 1)
-    c_4 = ConditionStmt(z <= 8)
-    tr = BackwardTrace([c_1, a_1, c_2, c_3, a_2, c_4])
-    # test_trace(tr)
-    # test_interval()
+    test_interval()
+    test_interval_set()
     test_generalize()
     # test_interval_intersection()
     # help_simplify()
