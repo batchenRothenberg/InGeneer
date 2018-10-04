@@ -1,6 +1,6 @@
 from stmt import *
 from domain import Domain
-
+from utils import simplify_and_propagate_ineqs
 
 class PreciseDomain(Domain):
 
@@ -9,18 +9,13 @@ class PreciseDomain(Domain):
 
     def do_step(self, f, st):
         if st.is_assignment():
-            weakest_precondition_goal = Goal()
-            fresh_var = Const(str(st.lhs) + "'", st.lhs.sort())
-            new_f = substitute(f, [(st.lhs, fresh_var)])
-            new_assign = (fresh_var == st.rhs)
-            weakest_precondition_goal.add(Exists([fresh_var], And(new_assign, new_f)))
-            t = Tactic('qe')  # quantifier elimination
-            wp = t(weakest_precondition_goal).as_expr()
+            new_f = substitute(f, [(st.lhs, st.rhs)])
+            wp = new_f
         else:
             assert (st.is_condition())
             wp = And(f, st.expr)
         if self.simplification:
-            wp = simplify(wp)
+            wp = simplify_and_propagate_ineqs(wp)
         return wp
 
     def set_simplification(self,simpl):

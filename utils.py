@@ -63,6 +63,15 @@ def negate_condition(cond):
     pass
 
 
+def simplify_and_propagate_ineqs(f):
+    goal = Goal()
+    goal.add(f)
+    t_1 = Tactic('simplify')
+    t_2 = Tactic('propagate-ineqs')
+    t = Then(t_1,t_2)
+    return t(goal).as_expr()
+
+
 class TopologicalSort():
     __metaclass__ = ABCMeta
 
