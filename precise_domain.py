@@ -22,7 +22,7 @@ class PreciseDomain(Domain):
         if model is None:
             return True
         else:
-            return model.evaluate(And(formula,stmt.expr))
+            return is_true(model.evaluate(And(formula,stmt.expr)))
 
     def set_simplification(self,simpl):
         self.simplification = simpl
