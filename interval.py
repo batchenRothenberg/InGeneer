@@ -56,13 +56,13 @@ class IntervalBorder:
 
     def __lt__(self, other):
         assert (isinstance(other, int) or isinstance(other, IntervalBorder) or other == MINF or other == INF)
-        if isinstance(other, str) and other == MINF:
+        if (isinstance(other, str) and other == MINF) or (isinstance(other, IntervalBorder) and other.n == MINF):
             return False
         if isinstance(self.n, str) and self.n == MINF:
             return True
         if isinstance(self.n, str) and self.n == INF:
             return False
-        if isinstance(other, str) and other == INF:
+        if (isinstance(other, str) and other == INF) or (isinstance(other, IntervalBorder) and other.n == INF):
             return True
         assert isinstance(self.n, int) and (isinstance(other, int) or isinstance(other, IntervalBorder))
         if isinstance(other, int):
