@@ -24,7 +24,7 @@ class Generalizer:
             self.annotation.append(formula)
         for stmt in abstract_trace:
             if print_annotation:
-                print("Doing generalization step with "+str(stmt))
+                print("Doing step with "+str(stmt))
             formula = step_function(formula,stmt, model)
             if print_annotation:
                 print(formula)
