@@ -72,6 +72,34 @@ def simplify_and_propagate_ineqs(f):
     return t(goal).as_expr()
 
 
+def remove_or(f, guiding_model):
+    goal = Goal()
+    goal.add(f)
+    t = Tactic('nnf')
+    nnf_formula = t(goal).as_expr()
+    res = _remove_or_aux(nnf_formula,guiding_model)
+    return res
+
+
+def _remove_or_aux(nnf_formula, guiding_model):
+    # Every sub-formula that isn't an 'or' or an 'and' stops the recursion.
+    # We assume conversion to nnf already removed other operators, such as Implies, Ite, etc.
+    if not is_or(nnf_formula) and not is_and(nnf_formula):
+        return nnf_formula
+    # Step cases:
+    if is_or(nnf_formula):
+        for c in nnf_formula.children():
+            if is_true(guiding_model.evaluate(c)):
+                return _remove_or_aux(c, guiding_model)
+        assert False
+    else:
+        assert is_and(nnf_formula)
+        new_children=[]
+        for c in nnf_formula.children():
+            new_children.append(_remove_or_aux(c,guiding_model))
+        return And(new_children)
+
+
 class TopologicalSort():
     __metaclass__ = ABCMeta
 
