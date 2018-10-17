@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from formula_strengthener import strengthen
 from precise_domain import *
 from interval_domain import *
 from z3 import *
@@ -344,6 +345,33 @@ def test_remove_or():
     print(r)
 
 
+def test_formula_strengthener():
+    f = Implies(And(Not(If(x > 0, y < 0, y > 0)), Or(z <= 7, x <= 8)), y == 2)
+    s = Solver()
+    s.push()
+    s.add(f)
+    s.check()
+    m = s.model()
+    r = strengthen(f, m)
+    print(r)
+    f = (x > 0)
+    s.pop()
+    s.push()
+    s.add(f)
+    s.check()
+    m = s.model()
+    r = strengthen(f, m)
+    print(r)
+    f = And(x > 0, And(y<0, x>=7))
+    s.pop()
+    s.push()
+    s.add(f)
+    s.check()
+    m = s.model()
+    r = strengthen(f, m)
+    print(r)
+
+
 def main():
     # test_interval()
     # test_interval_set()
@@ -351,7 +379,8 @@ def main():
     # test_interval_intersection()
     # describe_tactics()
     # test_sort()
-    test_remove_or()
+    # test_remove_or()
+    test_formula_strengthener()
 
 
 if __name__ == "__main__":
