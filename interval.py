@@ -114,6 +114,26 @@ class IntervalBorder:
         else:
             return self.n + other
 
+    def __sub__(self, other):
+        other_is_int = isinstance(other, int)
+        self_is_int = isinstance(self.n, int)
+        assert (other_is_int or other == MINF or other == INF)
+
+        # Can't subtract INF from INF or MINF from MINF
+        assert not (not other_is_int and not self_is_int and self.n == INF and other == INF)
+        assert not (not other_is_int and not self_is_int and self.n == MINF and other == MINF)
+
+        if (not other_is_int and other == MINF) or (not self_is_int and self.n == INF):
+            return inf_str_to_number(INF)
+        elif (not other_is_int and other == INF) or (not self_is_int and self.n == MINF):
+            return inf_str_to_number(MINF)
+        else:
+            return self.n - other
+
+
+    def __add__(self, other):
+        return self.__radd__(other)
+
     def add(self, other):
         assert isinstance(other, IntervalBorder)
         return self.n + other
@@ -166,6 +186,12 @@ class Interval:
     def is_infinite(self):
         return self.low.is_minf() or self.high.is_inf()
 
+    def is_high_inf(self):
+        return self.high.is_inf()
+
+    def is_low_minf(self):
+        return self.low.is_minf()
+
     def __len__(self):
         if self.is_bottom():
             return 0
@@ -195,6 +221,24 @@ class Interval:
 
     def __ne__(self, other):
         return not self == other
+
+    def get_all_values_generator(self):
+        assert not self.is_top()
+        if self.is_high_inf():
+            n = self.low
+            while True:
+                yield n
+                n = n + 1
+        elif self.is_low_minf():
+            n = self.high
+            while True:
+                yield n
+                n = n - 1
+        else:
+            n = self.low
+            while n <= self.high:
+                yield n
+                n = n + 1
 
 
 class IntervalSet:
