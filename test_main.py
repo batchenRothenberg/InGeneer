@@ -36,6 +36,17 @@ a_5_1 = AssignmentStmt(z == z - 3)
 tr_TFT = BackwardTrace([c_1_0, a_1_0, c_2_2, c_3_0, a_2_0, c_4_0])
 mt_TFT = BackwardTrace([[c_1_0, c_1_1, c_1_2, c_1_3], [a_1_0, a_1_1], [c_2_0,c_2_1,c_2_2], [c_3_0,c_3_1,c_3_2], [a_2_0,a_2_1], [c_4_0]])
 
+i_1 = Interval(3, 5)
+i_2 = Interval(-2, 6)
+i_3 = Interval("minf", "inf")
+i_4 = Interval("minf", 7)
+i_5 = Interval(-5, "inf")
+i_6 = Interval(-5, -10)
+i_7 = Interval(5, 0)
+i_8 = Interval(-1, 4)
+i_9 = Interval(4, 8)
+i_10 = Interval(-10, -2)
+
 I = IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17)})
 I_1 = IntervalSet({"x": Interval(3, 7)})
 interval_domain = IntervalDomain()
@@ -45,13 +56,6 @@ wp_generalizer = Generalizer(wp_domain, debug=True)
 
 
 def test_interval():
-    i_1 = Interval(3, 5)
-    i_2 = Interval(-2, 6)
-    i_3 = Interval("minf", "inf")
-    i_4 = Interval("minf", 7)
-    i_5 = Interval(-5, "inf")
-    i_6 = Interval(-5, -10)
-    i_7 = Interval(5, 0)
     assert not i_1.is_bottom()
     assert not i_2.is_bottom()
     assert not i_3.is_bottom()
@@ -104,13 +108,10 @@ def test_interval():
     assert Interval.intersection([i_2, i_3, i_5]) == i_2
     assert Interval.intersection([i_2]) == i_2
     assert Interval.intersection([i_6]) == i_6
-    i_8 = Interval(-1, 4)
-    i_9 = Interval(4, 8)
     assert Interval.intersection([i_1, i_8]) == Interval(3,4)
     assert Interval.intersection([i_9, i_1]) == Interval(4,5)
     assert Interval.intersection([i_9, i_1, i_8]) == Interval(4,4)
     assert Interval.intersection([i_9, i_1, i_8, i_4]) == Interval(4,4)
-    i_10 = Interval(-10,-2)
     assert Interval.intersection([i_10, i_8]) == Interval(-1,-2)
     assert Interval.intersection([i_10, i_8]) == i_6
     assert Interval.intersection([i_10, i_8, i_2, i_3, i_1]) == i_6
@@ -372,6 +373,32 @@ def test_formula_strengthener():
     print(r)
 
 
+def test_interval_get_values():
+    assert [v for v in i_1.get_all_values_generator()]==[3,4,5]
+    assert [v for v in i_2.get_all_values_generator()]==[-2,-1,0,1,2,3,4,5,6]
+    assert [v for v in i_6.get_all_values_generator()]==[]
+    assert [v for v in i_7.get_all_values_generator()]==[]
+    assert [v for v in i_8.get_all_values_generator()]==[-1,0,1,2,3,4]
+    assert [v for v in i_9.get_all_values_generator()]==[4,5,6,7,8]
+    assert [v for v in i_10.get_all_values_generator()]==[-10,-9,-8,-7,-6,-5,-4,-3,-2]
+    count = 0
+    res = []
+    for v in i_4.get_all_values_generator():
+        if count == 5:
+            break
+        res.append(v)
+        count += 1
+    assert res == [7,6,5,4,3]
+    res, count = [], 0
+    for v in i_5.get_all_values_generator():
+        if count == 5:
+            break
+        res.append(v)
+        count += 1
+    assert res == [-5,-4,-3,-2,-1]
+    print("test_interval_get_values SUCCESS")
+
+
 def main():
     # test_interval()
     # test_interval_set()
@@ -380,7 +407,8 @@ def main():
     # describe_tactics()
     # test_sort()
     # test_remove_or()
-    test_formula_strengthener()
+    # test_formula_strengthener()
+    test_interval_get_values()
 
 
 if __name__ == "__main__":
