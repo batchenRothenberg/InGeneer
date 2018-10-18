@@ -52,7 +52,7 @@ class IntervalBorder:
                 return False
 
     def __ne__(self, other):
-        return not __eq__(self, other)
+        return not self.__eq__(other)
 
     def __lt__(self, other):
         assert (isinstance(other, int) or isinstance(other, IntervalBorder) or other == MINF or other == INF)
@@ -87,10 +87,10 @@ class IntervalBorder:
             return self.n > other.n
 
     def __le__(self, other):
-        return __lt__(self, other) or __eq__(self, other)
+        return self.__lt__(other) or self.__eq__(other)
 
     def __ge__(self, other):
-        return __gt__(self, other) or __eq__(self, other)
+        return self.__gt__(other) or self.__eq__(other)
 
     def is_inf(self):
         return isinstance(self.n, str) and self.n == INF
