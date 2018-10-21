@@ -297,7 +297,7 @@ class IntervalSet:
         return self.dict == other.dict
 
     def __ne__(self, other):
-        return not __eq__(self, other)
+        return not self.__eq__(other)
 
 
 def max_of_two_with_minf(n, m):
