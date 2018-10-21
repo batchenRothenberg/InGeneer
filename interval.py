@@ -183,6 +183,14 @@ class Interval:
     def is_top(self):
         return self.low.is_minf() and self.high.is_inf()
 
+    @staticmethod
+    def get_bottom():
+        return Interval(1,-1)
+
+    @staticmethod
+    def get_top():
+        return Interval(MINF,INF)
+
     def is_infinite(self):
         return self.low.is_minf() or self.high.is_inf()
 
@@ -212,6 +220,10 @@ class Interval:
         max_low = max([i.low for i in intervals])
         min_high = min([i.high for i in intervals])
         return Interval(max_low.n, min_high.n)
+
+    def intersect(self, other):
+        """Returns a new interval which is the result of the intersection of self and other."""
+        return Interval.intersection([self,other])
 
     def __eq__(self, other):
         assert isinstance(other, Interval)
@@ -298,6 +310,14 @@ class IntervalSet:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def add_interval(self, var, interval):
+        if interval.is_top():
+            return
+        elif var not in self.dict.keys():
+            self.dict[var] = interval
+        else: #var in self.dict.keys()
+            self.dict[var] = self.dict[var].intersect(interval)
 
 
 def max_of_two_with_minf(n, m):
