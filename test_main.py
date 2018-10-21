@@ -47,8 +47,6 @@ i_8 = Interval(-1, 4)
 i_9 = Interval(4, 8)
 i_10 = Interval(-10, -2)
 
-I = IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17)})
-I_1 = IntervalSet({"x": Interval(3, 7)})
 interval_domain = IntervalDomain()
 interval_generalizer = Generalizer(interval_domain, debug=True)
 wp_domain = PreciseDomain()
@@ -117,17 +115,48 @@ def test_interval():
     assert Interval.intersection([i_10, i_8, i_2, i_3, i_1]) == i_6
     print("SUCCESS: test_interval")
 
+I_1 = IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17)})
+I_2 = IntervalSet({"x": Interval(3, 7)})
+I_3 = IntervalSet({"x": i_1,"y": i_2})
+I_4 = IntervalSet({"x": i_1,"y": i_2, "z": i_4})
+I_5 = IntervalSet.get_top()
+I_6 = IntervalSet.get_bottom()
+I_7 = IntervalSet({"x": i_10,"y": i_7, "z": i_5})
+
 def test_interval_set():
-    # todo: Add TEST
-    # I_1 = IntervalSet([i_1,i_2,i_3])
-    # print(I_1)
-    # I_2 = IntervalSet([])
-    # print(I_2)
-    # I_3 = IntervalSet([i_2,i_3,i_6])
-    # print(I_3)
-    # I_4 = IntervalSet([i_1,i_2,i_3,i_4])
-    # print(I_4)
-    pass
+    assert not I_1.is_top()
+    assert not I_2.is_top()
+    assert not I_3.is_top()
+    assert not I_4.is_top()
+    assert I_5.is_top()
+    assert not I_6.is_top()
+    assert not I_7.is_top()
+    assert not I_1.is_bottom()
+    assert not I_2.is_bottom()
+    assert not I_3.is_bottom()
+    assert not I_4.is_bottom()
+    assert not I_5.is_bottom()
+    assert I_6.is_bottom()
+    assert I_7.is_bottom()
+    I_1.add_interval("z", i_1)
+    assert I_1 == IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17), "z": i_1})
+    I_1.add_interval("z", i_1)
+    assert I_1 == IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17), "z": i_1})
+    I_1.add_interval("z", i_8)
+    assert I_1 != IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17), "z": i_1})
+    assert I_1 == IntervalSet({"x": Interval(3, 7), "y": Interval(-3, 17), "z": Interval(3,4)})
+    I_1.add_interval("x", i_8)
+    assert I_1 == IntervalSet({"x": Interval(3, 4), "y": Interval(-3, 17), "z": Interval(3,4)})
+    I_1.add_interval("y", i_10)
+    assert I_1 == IntervalSet({"x": Interval(3, 4), "y": Interval(-3, -2), "z": Interval(3,4)})
+    oldI_1 = I_1
+    I_1.add_interval("y", i_8)
+    assert oldI_1 == I_1
+    I_1.add_interval("x", Interval.get_top())
+    assert oldI_1 == I_1
+    I_1.add_interval("x", Interval.get_bottom())
+    assert I_1.is_bottom()
+    print("SUCCESS: test_interval_Set")
 
 def test_wp_generalize(tr):
     x = Int('x')
@@ -234,9 +263,9 @@ def test_wp_generalize_input():
 def test_interval_generalize_trace():
     r = interval_generalizer.generalize_trace(mt_TFT, print_annotation=True)
     assert len(r)==0
-    r_1 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I, record_annotation=True)
+    r_1 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, record_annotation=True)
     assert len(r_1)==0
-    r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_1, print_annotation=True, record_annotation=True)
+    r_2 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=I_2, print_annotation=True, record_annotation=True)
     assert len(r_2)==0
     r_3 = interval_generalizer.generalize_trace(mt_TFT, initial_formula=interval_domain.get_bottom())
     assert len(r_3)==0
@@ -245,10 +274,10 @@ def test_interval_generalize_trace():
 def test_interval_generalize_input():
     r = interval_generalizer.generalize_input(tr_TFT,print_annotation=True)
     assert interval_domain.is_top(r)
-    r_1 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I, record_annotation=True)
-    assert r_1 == I
-    r_2 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I_1,print_annotation=True, record_annotation=True)
-    assert r_2 == I_1
+    r_1 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I_1, record_annotation=True)
+    assert r_1 == I_1
+    r_2 = interval_generalizer.generalize_input(tr_TFT, initial_formula=I_2, print_annotation=True, record_annotation=True)
+    assert r_2 == I_2
     r_3 = interval_generalizer.generalize_input(tr_TFT, initial_formula=interval_domain.get_bottom())
     assert interval_domain.is_bottom(r_3)
     print("SUCCESS: test_interval_generalize_input")
@@ -396,19 +425,19 @@ def test_interval_get_values():
         res.append(v)
         count += 1
     assert res == [-5,-4,-3,-2,-1]
-    print("test_interval_get_values SUCCESS")
+    print("SUCCESS: test_interval_get_values")
 
 
 def main():
     # test_interval()
-    # test_interval_set()
+    test_interval_set()
     # test_generalize()
     # test_interval_intersection()
     # describe_tactics()
     # test_sort()
     # test_remove_or()
     # test_formula_strengthener()
-    test_interval_get_values()
+    # test_interval_get_values()
 
 
 if __name__ == "__main__":
