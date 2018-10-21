@@ -60,7 +60,31 @@ def get_vars_and_coefficients(f):
 
 
 def negate_condition(cond):
-    pass
+    if cond.num_args() < 2:
+        print("WARNING: could not negate condition "+str(cond))
+        return cond
+    else:
+        arg0 = cond.arg(0)
+        arg1 = cond.arg(1)
+        if is_le(cond):
+            return arg0 > arg1
+        if is_lt(cond):
+            return arg0 >= arg1
+        if is_ge(cond):
+            return arg0 < arg1
+        if is_gt(cond):
+            return arg0 <= arg1
+        if is_eq(cond):
+            return arg0 != arg1
+        if is_distinct(cond):
+            return arg0 == arg1
+        else:
+            print("WARNING: could not negate condition " + str(cond))
+            return cond
+
+
+def is_binary_boolean(c):
+    return is_lt(c) or is_le(c) or is_gt(c) or is_ge(c) or is_eq(c) or is_distinct(c)
 
 
 def simplify_and_propagate_ineqs(f):
