@@ -1,6 +1,6 @@
 from z3 import *
 from interval import *
-from utils import remove_or, negate_condition, is_binary_boolean
+from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binary_expr
 
 
 class StrenghenedFormula():
@@ -63,17 +63,9 @@ def _add_interval_for_binary_boolean(lhs, rhs_value, res, conjunct, lhs_value):
 
 
 def _strengthen_binary_boolean_conjunct(conjunct, model, res):
-    lhs, rhs, lhs_value, rhs_value = _evaluate_binary_conjunct(conjunct,model)
+    lhs, rhs, lhs_value, rhs_value = evaluate_binary_expr(conjunct,model)
     print("rhs value: " + str(rhs_value) + " lhs_value: " + str(lhs_value))
     if is_const(lhs):
         _add_interval_for_binary_boolean(lhs,rhs_value,res, conjunct, lhs_value)
     else:
         res.add_unsimplified_demand(conjunct)
-
-
-def _evaluate_binary_conjunct(conjunct, model):
-    lhs = conjunct.arg(0)
-    rhs = conjunct.arg(1)
-    rhs_value = model.evaluate(rhs).as_long()
-    lhs_value = model.evaluate(lhs).as_long()
-    return lhs, rhs, lhs_value, rhs_value

@@ -87,6 +87,15 @@ def is_binary_boolean(c):
     return is_lt(c) or is_le(c) or is_gt(c) or is_ge(c) or is_eq(c) or is_distinct(c)
 
 
+def evaluate_binary_expr(expr, model):
+    assert len(expr.children()) == 2
+    arg0 = expr.arg(0)
+    arg1 = expr.arg(1)
+    arg1_value = model.evaluate(arg1).as_long()
+    arg0_value = model.evaluate(arg0).as_long()
+    return arg0, arg1, arg0_value, arg1_value
+
+
 def simplify_and_propagate_ineqs(f):
     goal = Goal()
     goal.add(f)
