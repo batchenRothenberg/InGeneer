@@ -164,6 +164,34 @@ def simplify_and_propagate_ineqs(f):
     return t(goal).as_expr()
 
 
+def print_all_models(f, limit=10000):
+    s = Solver()
+    s.add(f)
+    count = 0
+    while count < limit and s.check() == sat:
+        count += 1
+        m = s.model()
+        print(m)
+        s.add(get_formula_from_model(m))
+    if count == limit:
+        print("max number of models reached")
+
+# From: https://stackoverflow.com/questions/11867611/z3py-checking-all-solutions-for-equation
+def get_formula_from_model(model):
+    block = []
+    for d in model:
+        # d is a declaration
+        if d.arity() > 0:
+            raise Z3Exception("uninterpreted functions are not supported")
+        # create a constant from declaration
+        c = d()
+        if is_array(c) or c.sort().kind() == Z3_UNINTERPRETED_SORT:
+            raise Z3Exception("arrays and uninterpreted sorts are not supported")
+        block.append(c != model[d])
+    # print(Or(block))
+    return (Or(block))
+
+
 def remove_or(f, guiding_model):
     goal = Goal()
     goal.add(f)
@@ -190,6 +218,12 @@ def _remove_or_aux(nnf_formula, guiding_model):
         for c in nnf_formula.children():
             new_children.append(_remove_or_aux(c,guiding_model))
         return And(new_children)
+
+
+def wrapper(func, *args, **kwargs):
+    def wrapped():
+        return func(*args, **kwargs)
+    return wrapped
 
 
 class TopologicalSort():
