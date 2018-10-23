@@ -119,6 +119,24 @@ def build_binary_expression(lhs, rhs, op):
         return None
 
 
+def binary_bool_op_to_string(op):
+    if op == Z3_OP_LE:
+        return "<="
+    elif op == Z3_OP_LT:
+        return "<"
+    elif op == Z3_OP_GE:
+        return ">="
+    elif op == Z3_OP_GT:
+        return ">"
+    elif op == Z3_OP_EQ:
+        return "=="
+    elif op == Z3_OP_DISTINCT:
+        return "!="
+    else:
+        print("warning Unssoported operator")
+        return None
+
+
 def reverse_operator(op):
     if op == Z3_OP_LE:
         return Z3_OP_GE
