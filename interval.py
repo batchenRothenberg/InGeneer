@@ -319,6 +319,34 @@ class IntervalSet:
         else: #var in self.dict.keys()
             self.dict[var] = self.dict[var].intersect(interval)
 
+    def print_all_values(self, limit = 100):
+        if self.is_bottom():
+            print("No solutions available.")
+            return
+        if self.is_top():
+            print("All variables can obtain all values.")
+            return
+        res = []
+        limit_fake_list = [limit]
+        remaining_vars = self.dict.keys()
+        remaining_len = len(self.dict.keys())
+        self._print_all_values_aux(limit_fake_list, res, remaining_vars, remaining_len)
+
+    def _print_all_values_aux(self, limit, res, remaining_vars, remaining_len):
+        if remaining_len == 0:
+            limit[0] = limit[0] - 1
+            print res
+            if limit[0] == 0:
+                print("Max number of solutions reached")
+            return
+        v = remaining_vars[0]
+        for val in self.dict[v].get_all_values_generator():
+            res.append(str(v)+"=="+str(val))
+            self._print_all_values_aux(limit, res, remaining_vars[1:], remaining_len - 1)
+            if limit[0] == 0:
+                return
+            res.pop()
+
 
 def max_of_two_with_minf(n, m):
     if isinstance(n, str):
