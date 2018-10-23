@@ -6,9 +6,10 @@ from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binar
 
 class StrenghenedFormula():
 
-    def __init__(self):
+    def __init__(self, debug = False):
         self.unsimplified_demands = []
         self.interval_set = IntervalSet.get_top()
+        self.debug = debug
 
     def add_unsimplified_demand(self, demand):
         self.unsimplified_demands.append(demand)
@@ -55,7 +56,6 @@ class StrenghenedFormula():
             return Z3_OP_LT
 
     def _strengthen_add(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
-        # print("strengthening add: ",lhs)
         if op == Z3_OP_LE:
             lhs_value = lhs_arg0_val + lhs_arg1_val
             diff = rhs_value - lhs_value
@@ -88,7 +88,8 @@ class StrenghenedFormula():
             self._strengthen_binary_boolean_conjunct(var, var_value, rhs_value // constant + is_round_up, reversed_op, model)
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
-        print("lhs " + str(lhs) + " rhs_value: " + str(rhs_value))
+        if self.debug:
+            print("lhs: " + str(lhs) + " rhs_value: " + str(rhs_value))
         if is_const(lhs):
             self._add_interval_for_binary_boolean(lhs, lhs_value, rhs_value, op)
         elif is_app_of(lhs, Z3_OP_UMINUS):
@@ -108,8 +109,8 @@ class StrenghenedFormula():
             self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
 
 
-def strengthen(f, model):
-    res = StrenghenedFormula()
+def strengthen(f, model, debug = False):
+    res = StrenghenedFormula(debug)
     f_as_and = remove_or(f, model)
     print("f_as_and: "+str(f_as_and))
     if is_and(f_as_and):
