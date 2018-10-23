@@ -87,13 +87,54 @@ def is_binary_boolean(c):
     return is_lt(c) or is_le(c) or is_gt(c) or is_ge(c) or is_eq(c) or is_distinct(c)
 
 
+def is_binary(expr):
+    return len(expr.children()) == 2
+
+
 def evaluate_binary_expr(expr, model):
     assert len(expr.children()) == 2
     arg0 = expr.arg(0)
     arg1 = expr.arg(1)
     arg1_value = model.evaluate(arg1).as_long()
     arg0_value = model.evaluate(arg0).as_long()
-    return arg0, arg1, arg0_value, arg1_value
+    op = expr.decl().kind()
+    return arg0, arg1, arg0_value, arg1_value, op
+
+
+def build_binary_expression(lhs, rhs, op):
+    if op == Z3_OP_LE:
+        return lhs <= rhs
+    elif op == Z3_OP_LT:
+        return lhs < rhs
+    elif op == Z3_OP_GE:
+        return lhs >= rhs
+    elif op == Z3_OP_GT:
+        return lhs > rhs
+    elif op == Z3_OP_EQ:
+        return lhs == rhs
+    elif op == Z3_OP_DISTINCT:
+        return lhs != rhs
+    else:
+        print("warning Unssoported operator")
+        return None
+
+
+def reverse_operator(op):
+    if op == Z3_OP_LE:
+        return Z3_OP_GE
+    elif op == Z3_OP_LT:
+        return Z3_OP_GT
+    elif op == Z3_OP_GE:
+        return Z3_OP_LE
+    elif op == Z3_OP_GT:
+        return Z3_OP_LT
+    elif op == Z3_OP_EQ:
+        return Z3_OP_EQ
+    elif op == Z3_OP_DISTINCT:
+        return Z3_OP_DISTINCT
+    else:
+        print("warning Unssoported operator")
+        return None
 
 
 def simplify_and_propagate_ineqs(f):
