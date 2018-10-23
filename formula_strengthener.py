@@ -1,7 +1,7 @@
 from z3 import *
 from interval import *
 from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
-    is_binary, reverse_operator
+    is_binary, reverse_operator, binary_bool_op_to_string
 
 
 class StrenghenedFormula():
@@ -89,7 +89,7 @@ class StrenghenedFormula():
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
-            print("lhs: " + str(lhs) + " rhs_value: " + str(rhs_value))
+            print("Strnghening: " + str(lhs) + " " + binary_bool_op_to_string(op) + " " + str(rhs_value))
         if is_const(lhs):
             self._add_interval_for_binary_boolean(lhs, lhs_value, rhs_value, op)
         elif is_app_of(lhs, Z3_OP_UMINUS):
