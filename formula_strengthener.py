@@ -1,7 +1,7 @@
 from z3 import *
 from interval import *
 from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
-    is_binary, reverse_operator, binary_bool_op_to_string
+    is_binary, reverse_operator, binary_bool_op_to_string, print_all_models
 
 
 class StrenghenedFormula():
@@ -78,6 +78,12 @@ class StrenghenedFormula():
         elif op == Z3_OP_EQ:
             self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val, op, model)
             self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val, op, model)
+
+    def get_unsimplified_formula(self):
+        return And(self.unsimplified_demands)
+
+    def print_all_solutions(self, limit=10000):
+        return print_all_models(self.get_unsimplified_formula(),limit)
 
     def _strengthen_mul_by_constant(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
         if is_int_value(lhs_arg0):
