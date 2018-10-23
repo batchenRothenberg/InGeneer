@@ -43,9 +43,8 @@ class StrenghenedFormula():
             self.add_interval(str(var), Interval(rhs_value + 1, INF))
         elif op == Z3_OP_EQ:
             self.add_interval(str(var), Interval(rhs_value, rhs_value))
-        elif op == Z3_OP_DISTINCT:
-            self._add_interval_for_binary_boolean(var, var_value, rhs_value,
-                                             self._replace_distinct_with_ineq(var_value, rhs_value))
+        else:
+            assert False
 
     @staticmethod
     def _replace_distinct_with_ineq(lhs_value, rhs_value):
@@ -75,10 +74,6 @@ class StrenghenedFormula():
             constant = lhs_arg1_val
             var = lhs_arg0
             var_value = lhs_arg0_val
-        if op == Z3_OP_DISTINCT:
-            ineq_op = self._replace_distinct_with_ineq(constant * var_value, rhs_value)
-            self._strengthen_mul_by_constant(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, ineq_op, rhs_value, model)
-            return
         if constant > 0:
             is_round_up = (op == Z3_OP_GE or op == Z3_OP_GT)
             self._strengthen_binary_boolean_conjunct(var, var_value, rhs_value // constant + is_round_up, op, model)
@@ -90,6 +85,10 @@ class StrenghenedFormula():
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
             print("Strnghening: " + str(lhs) + " " + binary_bool_op_to_string(op) + " " + str(rhs_value))
+        if op == Z3_OP_DISTINCT:
+            ineq_op = self._replace_distinct_with_ineq(lhs_value, rhs_value)
+            self._strengthen_binary_boolean_conjunct(lhs, lhs_value, rhs_value, ineq_op, model)
+            return
         if is_const(lhs):
             self._add_interval_for_binary_boolean(lhs, lhs_value, rhs_value, op)
         elif is_app_of(lhs, Z3_OP_UMINUS):
