@@ -63,6 +63,21 @@ class StrenghenedFormula():
             second_addition = diff - first_addition
             self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val + first_addition, op, model)
             self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val + second_addition, op, model)
+        elif op == Z3_OP_LT:
+            self._strengthen_add(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, Z3_OP_LE, rhs_value - 1, model)
+        elif op == Z3_OP_GE:
+            lhs_value = lhs_arg0_val + lhs_arg1_val
+            diff = lhs_value - rhs_value
+            assert diff >= 0
+            first_addition = diff // 2
+            second_addition = diff - first_addition
+            self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val - first_addition, op, model)
+            self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val - second_addition, op, model)
+        elif op == Z3_OP_GT:
+            self._strengthen_add(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, Z3_OP_GE, rhs_value + 1, model)
+        elif op == Z3_OP_EQ:
+            self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val, op, model)
+            self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val, op, model)
 
     def _strengthen_mul_by_constant(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
         if is_int_value(lhs_arg0):
