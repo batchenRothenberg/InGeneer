@@ -56,6 +56,7 @@ I_4 = IntervalSet({"x": i_1,"y": i_2, "z": i_4})
 I_5 = IntervalSet.get_top()
 I_6 = IntervalSet.get_bottom()
 I_7 = IntervalSet({"x": i_10,"y": i_7, "z": i_5})
+I_8 = IntervalSet({"x": i_1,"y": i_2, "z": i_8, "w": i_9, "t":i_10})
 
 f_1 = Or(x==0, y==1)
 f_2 = Not(And(x > 0, x < 3))
@@ -482,9 +483,23 @@ def test_interval_get_values():
     print("SUCCESS: test_interval_get_values")
 
 
-def test_interval_set__get_values():
+def test_interval_set_get_values():
+    print("Printing at most 100 models of "+str(I_1))
     I_1.print_all_values()
+    print("Printing at most 100 models of "+str(I_2))
+    I_2.print_all_values()
+    print("Printing at most 100 models of "+str(I_3))
+    I_3.print_all_values()
+    print("Printing at most 100 models of "+str(I_4))
+    I_4.print_all_values()
+    print("Printing at most 100 models of "+str(I_5))
     I_5.print_all_values()
+    print("Printing at most 100 models of "+str(I_6))
+    I_6.print_all_values()
+    print("Printing at most 100 models of "+str(I_7))
+    I_7.print_all_values()
+    print("Printing at most 1000 models of "+str(I_8))
+    I_8.print_all_values(limit=1000)
 
 def main():
     # test_interval()
@@ -495,9 +510,9 @@ def main():
     # help_simplify()
     # test_sort()
     # test_remove_or()
-    test_formula_strengthener()
+    # test_formula_strengthener()
     # test_interval_get_values()
-    # test_interval_set__get_values()
+    test_interval_set_get_values()
 
 
 if __name__ == "__main__":
