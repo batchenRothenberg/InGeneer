@@ -389,20 +389,22 @@ def test_remove_or():
 
 
 def test_formula_strengthener():
+    ofile = open_csv_file("results.csv")
     f = And(((x + y)*(x + 1) <= 8),(y <= 2),(x + z > 3))
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = (x > 0)
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = Implies(And(Not(If(x > 0, y < 0, y > 0)), Or(z <= 7, x <= 8)), y == 2)
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = And(x > 0, And(y<0, x>=7))
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = And(x <= 0, y + z <= 7)
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = And(x > 0, x - t <= 3, 5*y >= 4, y + z <= 7, z == 5, t != 4)
-    strengthen_formula_test(f)
+    strengthen_formula_test(f, ofile)
     f = And(-7*z+2*t-6*y!=5)
     strengthen_formula_test(f)
+    close_csv_file(ofile)
 
 
 def test_interval_get_values():

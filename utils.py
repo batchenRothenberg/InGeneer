@@ -1,3 +1,4 @@
+import csv
 import timeit
 from abc import ABCMeta, abstractmethod
 
@@ -252,6 +253,18 @@ def strengthen_formula_test(f, file = None):
         print("time to find first 10 solutions of f: " + str(ten_sol_f_time))
         print("time to find first 100 solutions of strengthened f: " + str(hundred_sol_stren_f_time))
         print("time to find first 100 solutions of f: " + str(hundred_sol_f_time))
+    else:
+        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer.writerow([str(f),str(r),str(stren_time),str(ten_sol_stren_f_time),str(ten_sol_f_time),str(hundred_sol_stren_f_time),str(hundred_sol_f_time)])
+
+
+def open_csv_file(file):
+    ofile = open(file, "wb")
+    return ofile
+
+
+def close_csv_file(ofile):
+    ofile.close()
 
 
 class TopologicalSort():
