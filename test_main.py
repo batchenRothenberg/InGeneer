@@ -168,6 +168,13 @@ def test_interval_set():
     assert oldI_1 == I_1
     I_1.add_interval("x", Interval.get_bottom())
     assert I_1.is_bottom()
+    assert "False" == str(I_1.as_formula())
+    assert "And(x <= 7, x >= 3)" == str(I_2.as_formula())
+    assert "And(y <= 6, y >= -2, x <= 5, x >= 3)" == str(I_3.as_formula())
+    assert "And(y <= 6, y >= -2, x <= 5, x >= 3, z <= 7)" == str(I_4.as_formula())
+    assert is_true(I_5.as_formula())
+    assert is_false(I_6.as_formula())
+    assert is_false(I_7.as_formula())
     print("SUCCESS: test_interval_Set")
 
 def test_wp_generalize(tr):
@@ -513,14 +520,14 @@ def test_interval_set_get_values():
 
 def main():
     # test_interval()
-    # test_interval_set()
+    test_interval_set()
     # test_generalize()
     # test_interval_intersection()
     # describe_tactics()
     # help_simplify()
     # test_sort()
     # test_remove_or()
-    test_formula_strengthener()
+    # test_formula_strengthener()
     # test_interval_get_values()
     # test_interval_set_get_values()
 
