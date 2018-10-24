@@ -1,6 +1,8 @@
+import timeit
 from abc import ABCMeta, abstractmethod
 
 from z3 import *
+import formula_strengthener
 
 
 # Wrapper for allowing Z3 ASTs to be stored into Python Hashtables.
@@ -224,6 +226,32 @@ def wrapper(func, *args, **kwargs):
     def wrapped():
         return func(*args, **kwargs)
     return wrapped
+
+
+def strengthen_formula_test(f, file = None):
+    s = Solver()
+    s.add(f)
+    s.check()
+    m = s.model()
+    r = formula_strengthener.strengthen(f, m)
+    wrapped = wrapper(formula_strengthener.strengthen, f, m)
+    stren_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(r.print_all_solutions, 10)
+    ten_sol_stren_f_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(print_all_models, f, 10)
+    ten_sol_f_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(r.print_all_solutions, 100)
+    hundred_sol_stren_f_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(print_all_models, f, 100)
+    hundred_sol_f_time = timeit.timeit(wrapped, number=1)
+    if file is None:
+        print("f is: " + str(f))
+        print("strengthened f: " + str(r))
+        print("time to strengthen f: " + str(stren_time))
+        print("time to find first 10 solutions of strengthened f: " + str(ten_sol_stren_f_time))
+        print("time to find first 10 solutions of f: " + str(ten_sol_f_time))
+        print("time to find first 100 solutions of strengthened f: " + str(hundred_sol_stren_f_time))
+        print("time to find first 100 solutions of f: " + str(hundred_sol_f_time))
 
 
 class TopologicalSort():
