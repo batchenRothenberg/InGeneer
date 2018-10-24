@@ -89,6 +89,9 @@ class StrenghenedFormula():
             print_all_models(self.get_unsimplified_formula(),limit)
         else:
             print("Printing all solutions of mixed demands anf intervals")
+            interval_formula = self.interval_set.as_formula()
+            f = And(interval_formula, self.get_unsimplified_formula())
+            print_all_models(f, limit)
 
     def _strengthen_mul_by_constant(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
         if is_int_value(lhs_arg0):
