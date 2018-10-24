@@ -1,4 +1,5 @@
 import sys
+from z3 import And, IntVal, Int, BoolVal
 
 MINF = "minf"
 INF = "inf"
@@ -346,6 +347,20 @@ class IntervalSet:
             if limit[0] == 0:
                 return
             res.pop()
+
+    def as_formula(self):
+        if self.is_top():
+            return BoolVal(True)
+        if self.is_bottom():
+            return BoolVal(False)
+        constraints = []
+        for var in self.dict.keys():
+            interval = self.dict[var]
+            if not interval.is_high_inf():
+                constraints.append(Int(var) <= IntVal(interval.high.n))
+            if not interval.is_low_minf():
+                constraints.append(Int(var) >= IntVal(interval.low.n))
+        return And(constraints)
 
 
 def max_of_two_with_minf(n, m):
