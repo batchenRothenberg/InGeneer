@@ -264,6 +264,10 @@ def strengthen_formula_test(f, file = None, debug = False):
     hundred_sol_stren_f_time = timeit.timeit(wrapped, number=1)
     wrapped = wrapper(print_all_models, f, 100)
     hundred_sol_f_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(r.print_all_solutions, 10000)
+    huge_sol_stren_f_time = timeit.timeit(wrapped, number=1)
+    wrapped = wrapper(print_all_models, f, 10000)
+    huge_sol_f_time = timeit.timeit(wrapped, number=1)
     if file is None:
         print("f is: " + str(f))
         print("strengthened f: " + str(r))
@@ -272,9 +276,19 @@ def strengthen_formula_test(f, file = None, debug = False):
         print("time to find first 10 solutions of f: " + str(ten_sol_f_time))
         print("time to find first 100 solutions of strengthened f: " + str(hundred_sol_stren_f_time))
         print("time to find first 100 solutions of f: " + str(hundred_sol_f_time))
+        print("time to find first 10000 solutions of strengthened f: " + str(huge_sol_stren_f_time))
+        print("time to find first 10000 solutions of f: " + str(huge_sol_f_time))
     else:
         writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
-        writer.writerow([str(f),str(r),str(stren_time),str(ten_sol_stren_f_time),str(ten_sol_f_time),str(hundred_sol_stren_f_time),str(hundred_sol_f_time)])
+        writer.writerow([str(f),
+                         str(r),
+                         str(stren_time),
+                         str(ten_sol_stren_f_time),
+                         str(ten_sol_f_time),
+                         str(hundred_sol_stren_f_time),
+                         str(hundred_sol_f_time),
+                         str(huge_sol_stren_f_time),
+                         str(huge_sol_f_time)])
 
 
 def open_csv_file(file):
