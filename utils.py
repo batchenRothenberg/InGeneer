@@ -94,6 +94,10 @@ def is_binary(expr):
     return len(expr.children()) == 2
 
 
+def is_uminus_on_int_value(expr):
+    return is_app_of(expr,Z3_OP_UMINUS) and is_int_value(expr.arg(0))
+
+
 def evaluate_binary_expr(expr, model):
     assert len(expr.children()) == 2
     arg0 = expr.arg(0)
