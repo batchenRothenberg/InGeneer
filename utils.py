@@ -244,12 +244,12 @@ def wrapper(func, *args, **kwargs):
     return wrapped
 
 
-def strengthen_formula_test(f, file = None):
+def strengthen_formula_test(f, file = None, debug = False):
     s = Solver()
     s.add(f)
     s.check()
     m = s.model()
-    r = formula_strengthener.strengthen(f, m)
+    r = formula_strengthener.strengthen(f, m, debug=debug)
     wrapped = wrapper(formula_strengthener.strengthen, f, m)
     stren_time = timeit.timeit(wrapped, number=1)
     wrapped = wrapper(r.print_all_solutions, 10)
