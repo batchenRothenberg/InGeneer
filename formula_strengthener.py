@@ -1,7 +1,7 @@
 from z3 import *
 from interval import *
 from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
-    is_binary, reverse_operator, binary_bool_op_to_string, print_all_models
+    is_binary, reverse_operator, binary_bool_op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
 
 
 class StrenghenedFormula():
@@ -54,30 +54,51 @@ class StrenghenedFormula():
             assert lhs_value < rhs_value
             return Z3_OP_LT
 
-    def _strengthen_add(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
+    def _strengthen_add(self, lhs_children, lhs_children_values, op, rhs_value, model):
+        num_children = len(lhs_children)
         if op == Z3_OP_LE:
-            lhs_value = lhs_arg0_val + lhs_arg1_val
+            lhs_value = sum(lhs_children_values)
             diff = rhs_value - lhs_value
             assert diff >= 0
-            first_addition = diff // 2
-            second_addition = diff - first_addition
-            self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val + first_addition, op, model)
-            self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val + second_addition, op, model)
+            minimal_addition = diff // num_children
+            extra_addition = diff - (minimal_addition * num_children)
+            count_given_extra_addition = 0
+            i = 0
+            while count_given_extra_addition < extra_addition:
+                value_i = lhs_children_values[i]
+                self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i + minimal_addition + 1, op, model)
+                count_given_extra_addition += 1
+                i += 1
+            while i < num_children:
+                value_i = lhs_children_values[i]
+                self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i + minimal_addition, op, model)
+                i += 1
         elif op == Z3_OP_LT:
-            self._strengthen_add(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, Z3_OP_LE, rhs_value - 1, model)
+            self._strengthen_add(lhs_children, lhs_children_values, Z3_OP_LE, rhs_value - 1, model)
         elif op == Z3_OP_GE:
-            lhs_value = lhs_arg0_val + lhs_arg1_val
+            lhs_value = sum(lhs_children_values)
             diff = lhs_value - rhs_value
             assert diff >= 0
-            first_addition = diff // 2
-            second_addition = diff - first_addition
-            self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val - first_addition, op, model)
-            self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val - second_addition, op, model)
+            minimal_subtraction = diff // num_children
+            extra_subtraction = diff - (minimal_subtraction * num_children)
+            count_given_extra_subtraction = 0
+            i = 0
+            while count_given_extra_subtraction < extra_subtraction:
+                value_i = lhs_children_values[i]
+                self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i - minimal_subtraction - 1, op,
+                                                         model)
+                count_given_extra_subtraction += 1
+                i += 1
+            while i < num_children:
+                value_i = lhs_children_values[i]
+                self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i - minimal_subtraction, op,
+                                                         model)
+                i += 1
         elif op == Z3_OP_GT:
-            self._strengthen_add(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, Z3_OP_GE, rhs_value + 1, model)
+            self._strengthen_add(lhs_children, lhs_children_values, Z3_OP_GE, rhs_value + 1, model)
         elif op == Z3_OP_EQ:
-            self._strengthen_binary_boolean_conjunct(lhs_arg0, lhs_arg0_val, lhs_arg0_val, op, model)
-            self._strengthen_binary_boolean_conjunct(lhs_arg1, lhs_arg1_val, lhs_arg1_val, op, model)
+            for i in range(0,num_children-1):
+                self._strengthen_binary_boolean_conjunct(lhs_children[i], lhs_children_values[i], lhs_children_values[i], op, model)
 
     def get_unsimplified_formula(self):
         return And(self.unsimplified_demands)
@@ -93,16 +114,7 @@ class StrenghenedFormula():
             f = And(interval_formula, self.get_unsimplified_formula())
             print_all_models(f, limit)
 
-    def _strengthen_mul_by_constant(self, lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model):
-        if is_int_value(lhs_arg0):
-            constant = lhs_arg0_val
-            var = lhs_arg1
-            var_value = lhs_arg1_val
-        else:
-            assert is_int_value(lhs_arg1)
-            constant = lhs_arg1_val
-            var = lhs_arg0
-            var_value = lhs_arg0_val
+    def _strengthen_mul_by_constant(self, constant, var, var_value, op, rhs_value, model):
         if constant > 0:
             is_round_up = (op == Z3_OP_GE or op == Z3_OP_GT)
             self._strengthen_binary_boolean_conjunct(var, var_value, rhs_value // constant + is_round_up, op, model)
@@ -123,14 +135,18 @@ class StrenghenedFormula():
         elif is_app_of(lhs, Z3_OP_UMINUS):
             arg0 = lhs.arg(0)
             self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_operator(op), model)
+        elif is_app_of(lhs, Z3_OP_ADD):
+            children_values = get_children_values(lhs, model)
+            self._strengthen_add(lhs.children(), children_values, op, rhs_value, model)
         elif is_binary(lhs):
             lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, lhs_op = evaluate_binary_expr(lhs, model)
-            if lhs_op == Z3_OP_ADD:
-                self._strengthen_add(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model)
-            elif lhs_op == Z3_OP_SUB:
-                self._strengthen_add(lhs_arg0, -lhs_arg1, lhs_arg0_val, -lhs_arg1_val, op, rhs_value, model)
-            elif lhs_op == Z3_OP_MUL and (is_int_value(lhs_arg0) or is_int_value(lhs_arg1)):
-                self._strengthen_mul_by_constant(lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, op, rhs_value, model)
+            if lhs_op == Z3_OP_SUB:
+                self._strengthen_add([lhs_arg0,-lhs_arg1],[lhs_arg0_val,-lhs_arg1_val], op, rhs_value, model)
+            elif lhs_op == Z3_OP_MUL:
+                if is_int_value(lhs_arg0) or is_uminus_on_int_value(lhs_arg0):
+                    self._strengthen_mul_by_constant(lhs_arg0_val, lhs_arg1, lhs_arg1_val, op, rhs_value, model)
+                elif is_int_value(lhs_arg1) or is_uminus_on_int_value(lhs_arg1):
+                    self._strengthen_mul_by_constant(lhs_arg1_val, lhs_arg0, lhs_arg0_val, op, rhs_value, model)
             else:
                 self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
         else:
