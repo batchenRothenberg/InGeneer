@@ -115,13 +115,14 @@ class StrenghenedFormula():
             print_all_models(f, limit)
 
     def _strengthen_mul_by_constant(self, constant, var, var_value, op, rhs_value, model):
+        division_rounded_down = rhs_value // constant
         if constant > 0:
-            is_round_up = (op == Z3_OP_GE or op == Z3_OP_GT)
-            self._strengthen_binary_boolean_conjunct(var, var_value, rhs_value // constant + is_round_up, op, model)
+            should_round_up = (op == Z3_OP_GE or op == Z3_OP_GT) and rhs_value % constant != 0
+            self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, op, model)
         elif constant < 0:
             reversed_op = reverse_operator(op)
-            is_round_up = (reversed_op == Z3_OP_GE or reversed_op == Z3_OP_GT)
-            self._strengthen_binary_boolean_conjunct(var, var_value, rhs_value // constant + is_round_up, reversed_op, model)
+            should_round_up = (reversed_op == Z3_OP_GE or reversed_op == Z3_OP_GT) and rhs_value % constant != 0
+            self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, reversed_op, model)
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
