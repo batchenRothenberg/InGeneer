@@ -203,6 +203,13 @@ def get_formula_from_model(model):
     return (Or(block))
 
 
+def get_children_values(expr, model):
+    res = []
+    for c in expr.children():
+        res.append(model.evaluate(c).as_long())
+    return res
+
+
 def remove_or(f, guiding_model):
     goal = Goal()
     goal.add(f)
