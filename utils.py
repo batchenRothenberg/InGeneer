@@ -117,6 +117,14 @@ def build_binary_expression(lhs, rhs, op):
         return lhs == rhs
     elif op == Z3_OP_DISTINCT:
         return lhs != rhs
+    elif op == Z3_OP_ADD:
+        return lhs + rhs
+    elif op == Z3_OP_SUB:
+        return lhs - rhs
+    elif op == Z3_OP_MUL:
+        return lhs * rhs
+    elif op == Z3_OP_DIV:
+        return lhs / rhs
     else:
         print("warning Unssoported operator")
         return None
