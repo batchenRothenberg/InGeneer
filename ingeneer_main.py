@@ -1,12 +1,18 @@
 import argparse
 import sys
 from z3 import *
+from formula_strengthener import *
+from utils import *
+import sys as _sys
 
 
-def read_program(args):
-    infile = args.infile
-    constraints = read_smt2(infile.name)
-    print(constraints)
+def read_program():
+    sys_args = _sys.argv[1:]
+    ofile = open_csv_file("benchmark_results.csv")
+    for file in sys_args:
+        constraints = read_smt2(file)
+        f = And(constraints)
+        strengthen_formula_test(f)
 
 
 def parse_args_ingeneer():
@@ -27,6 +33,6 @@ def read_smt2(filename):
 
 
 if __name__ == "__main__":
-    args = parse_args_ingeneer()
-    read_program(args)
+    # args = parse_args_ingeneer()
+    read_program()
 
