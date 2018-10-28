@@ -190,6 +190,8 @@ def print_all_models(f, limit=10000):
         s.add(get_formula_from_model(m))
     if count == limit:
         print("max number of models reached")
+    return count
+
 
 # From: https://stackoverflow.com/questions/11867611/z3py-checking-all-solutions-for-equation
 def get_formula_from_model(model):
@@ -256,28 +258,30 @@ def strengthen_formula_test(f, file = None, debug = False):
     r = formula_strengthener.strengthen(f, m, debug=debug)
     wrapped = wrapper(formula_strengthener.strengthen, f, m)
     stren_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(r.print_all_solutions, 10)
-    ten_sol_stren_f_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(print_all_models, f, 10)
-    ten_sol_f_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(r.print_all_solutions, 100)
-    hundred_sol_stren_f_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(print_all_models, f, 100)
-    hundred_sol_f_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(r.print_all_solutions, 10000)
-    huge_sol_stren_f_time = timeit.timeit(wrapped, number=1)
-    wrapped = wrapper(print_all_models, f, 10000)
-    huge_sol_f_time = timeit.timeit(wrapped, number=1)
+    res_ten_sol_stren_f, ten_sol_stren_f_time = timed(r.print_all_solutions)(10)
+    res_ten_sol_f, ten_sol_f_time = timed(print_all_models)(f,10)
+    res_hundred_sol_stren_f, hundred_sol_stren_f_time = timed(r.print_all_solutions)(100)
+    res_hundred_sol_f, hundred_sol_f_time = timed(print_all_models)(f,100)
+    res_huge_sol_stren_f, huge_sol_stren_f_time = timed(r.print_all_solutions)(10000)
+    res_huge_sol_f, huge_sol_f_time = timed(print_all_models)(f,10000)
+
     if file is None:
         print("f is: " + str(f))
         print("strengthened f: " + str(r))
         print("time to strengthen f: " + str(stren_time))
         print("time to find first 10 solutions of strengthened f: " + str(ten_sol_stren_f_time))
+        print("number of solutions found: " + str(res_ten_sol_stren_f))
         print("time to find first 10 solutions of f: " + str(ten_sol_f_time))
+        print("number of solutions found: " + str(res_ten_sol_f))
         print("time to find first 100 solutions of strengthened f: " + str(hundred_sol_stren_f_time))
+        print("number of solutions found: " + str(res_hundred_sol_stren_f))
         print("time to find first 100 solutions of f: " + str(hundred_sol_f_time))
+        print("number of solutions found: " + str(res_hundred_sol_f))
         print("time to find first 10000 solutions of strengthened f: " + str(huge_sol_stren_f_time))
+        print("number of solutions found: " + str(res_huge_sol_stren_f))
         print("time to find first 10000 solutions of f: " + str(huge_sol_f_time))
+        print("number of solutions found: " + str(res_huge_sol_f))
+
     else:
         writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow([str(f),
@@ -288,7 +292,18 @@ def strengthen_formula_test(f, file = None, debug = False):
                          str(hundred_sol_stren_f_time),
                          str(hundred_sol_f_time),
                          str(huge_sol_stren_f_time),
-                         str(huge_sol_f_time)])
+                         str(huge_sol_f_time)
+                         ])
+
+
+def timed(func):
+    def func_wrapper(*args, **kwargs):
+        import time
+        s = time.clock()
+        result = func(*args, **kwargs)
+        e = time.clock()
+        return result, e-s
+    return func_wrapper
 
 
 def open_csv_file(file):

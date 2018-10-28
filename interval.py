@@ -332,6 +332,7 @@ class IntervalSet:
         remaining_vars = self.dict.keys()
         remaining_len = len(self.dict.keys())
         self._print_all_values_aux(limit_fake_list, res, remaining_vars, remaining_len)
+        return limit - limit_fake_list[0]
 
     def _print_all_values_aux(self, limit, res, remaining_vars, remaining_len):
         if remaining_len == 0:

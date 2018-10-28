@@ -105,14 +105,14 @@ class StrenghenedFormula():
 
     def print_all_solutions(self, limit=100):
         if len(self.unsimplified_demands) == 0:
-            self.interval_set.print_all_values(limit)
+            return self.interval_set.print_all_values(limit)
         elif self.interval_set.is_top():
-            print_all_models(self.get_unsimplified_formula(),limit)
+            return print_all_models(self.get_unsimplified_formula(),limit)
         else:
             print("Printing all solutions of mixed demands anf intervals")
             interval_formula = self.interval_set.as_formula()
             f = And(interval_formula, self.get_unsimplified_formula())
-            print_all_models(f, limit)
+            return print_all_models(f, limit)
 
     def _strengthen_mul_by_constant(self, constant, var, var_value, op, rhs_value, model):
         division_rounded_down = rhs_value // constant
