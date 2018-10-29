@@ -157,7 +157,8 @@ class StrenghenedFormula():
 def strengthen(f, model, debug = False):
     res = StrenghenedFormula(debug)
     f_as_and = remove_or(f, model)
-    print("f_as_and: "+str(f_as_and))
+    if debug:
+        print("f_as_and: "+str(f_as_and))
     if is_and(f_as_and):
         for c in f_as_and.children():
             res._strengthen_conjunct(c, model)
