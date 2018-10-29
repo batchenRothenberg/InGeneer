@@ -306,12 +306,12 @@ def timed(func):
     return func_wrapper
 
 
-def open_csv_file(file):
+def open_file(file):
     ofile = open(file, "wb")
     return ofile
 
 
-def close_csv_file(ofile):
+def close_file(ofile):
     ofile.close()
 
 

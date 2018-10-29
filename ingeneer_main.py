@@ -8,7 +8,7 @@ import sys as _sys
 
 def read_program():
     sys_args = _sys.argv[1:]
-    ofile = open_csv_file("benchmark_results.csv")
+    ofile = open_file("benchmark_results.csv")
     for file in sys_args:
         constraints = read_smt2(file)
         f = And(constraints)
