@@ -1,14 +1,14 @@
 import timeit
 from collections import defaultdict
 
-from formula_strengthener import strengthen
 from precise_domain import *
 from interval_domain import *
 from z3 import *
 from interval import *
 from stmt import *
 from trace import *
-from utils import *
+from z3_utils import *
+from general_utils import *
 from generalizer import Generalizer
 
 x = Int('x')
@@ -335,7 +335,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: "+ str(f_1) +" model is: " + str(s.model()))
-    r = remove_or(f_1,m)
+    r = formula_strengthener.remove_or(f_1,m)
     assert (str(r) == "x == 0")
     s.pop()
     s.push()
@@ -343,7 +343,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: "+ str(f_2) +" model is: " + str(s.model()))
-    r = remove_or(f_2,m)
+    r = formula_strengthener.remove_or(f_2,m)
     assert (str(r) == "Not(x < 3)")
     s.pop()
     s.push()
@@ -351,7 +351,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: "+ str(f_3) +" model is: " + str(s.model()))
-    r = remove_or(f_3,m)
+    r = formula_strengthener.remove_or(f_3,m)
     assert(str(r) == "And(Not(y > 7), y < 4)")
     s.pop()
     s.push()
@@ -359,7 +359,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: "+ str(f_4) +" model is: " + str(s.model()))
-    r = remove_or(f_4,m)
+    r = formula_strengthener.remove_or(f_4,m)
     assert(str(r)=="And(x < 0, Not(y < 4))")
     s.pop()
     s.push()
@@ -367,7 +367,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: " + str(f_5) + " model is: " + str(s.model()))
-    r = remove_or(f_5,m)
+    r = formula_strengthener.remove_or(f_5,m)
     assert(str(r)=="y < 0")
     s.pop()
     s.push()
@@ -375,7 +375,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: " + str(f_6) + " model is: " + str(s.model()))
-    r = remove_or(f_6,m)
+    r = formula_strengthener.remove_or(f_6,m)
     assert(str(r)=="And(y < 0, x > 0)")
     s.pop()
     s.push()
@@ -383,7 +383,7 @@ def test_remove_or():
     s.check()
     m = s.model()
     # print("f is: " + str(f_7) + " model is: " + str(s.model()))
-    r = remove_or(f_7, m)
+    r = formula_strengthener.remove_or(f_7, m)
     assert(str(r)=="And(Not(z <= 7), Not(x <= 8))")
     print("test_remove_or SUCCESS")
 
@@ -405,6 +405,52 @@ def test_formula_strengthener():
     f = And(-7*z+2*t-6*y!=5)
     strengthen_formula_test(f)
     close_file(ofile)
+
+
+def strengthen_formula_test(f, file = None, debug = False):
+    s = Solver()
+    s.add(f)
+    s.check()
+    m = s.model()
+    r = formula_strengthener.strengthen(f, m, debug=debug)
+    wrapped = wrapper(formula_strengthener.strengthen, f, m)
+    stren_time = timeit.timeit(wrapped, number=1)
+    res_ten_sol_stren_f, ten_sol_stren_f_time = timed(r.print_all_solutions)(10)
+    res_ten_sol_f, ten_sol_f_time = timed(print_all_models)(f,10)
+    res_hundred_sol_stren_f, hundred_sol_stren_f_time = timed(r.print_all_solutions)(100)
+    res_hundred_sol_f, hundred_sol_f_time = timed(print_all_models)(f,100)
+    res_huge_sol_stren_f, huge_sol_stren_f_time = timed(r.print_all_solutions)(10000)
+    res_huge_sol_f, huge_sol_f_time = timed(print_all_models)(f,10000)
+
+    if file is None:
+        print("f is: " + str(f))
+        print("strengthened f: " + str(r))
+        print("time to strengthen f: " + str(stren_time))
+        print("time to find first 10 solutions of strengthened f: " + str(ten_sol_stren_f_time))
+        print("number of solutions found: " + str(res_ten_sol_stren_f))
+        print("time to find first 10 solutions of f: " + str(ten_sol_f_time))
+        print("number of solutions found: " + str(res_ten_sol_f))
+        print("time to find first 100 solutions of strengthened f: " + str(hundred_sol_stren_f_time))
+        print("number of solutions found: " + str(res_hundred_sol_stren_f))
+        print("time to find first 100 solutions of f: " + str(hundred_sol_f_time))
+        print("number of solutions found: " + str(res_hundred_sol_f))
+        print("time to find first 10000 solutions of strengthened f: " + str(huge_sol_stren_f_time))
+        print("number of solutions found: " + str(res_huge_sol_stren_f))
+        print("time to find first 10000 solutions of f: " + str(huge_sol_f_time))
+        print("number of solutions found: " + str(res_huge_sol_f))
+
+    else:
+        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer.writerow([str(f),
+                         str(r),
+                         str(stren_time),
+                         str(ten_sol_stren_f_time),
+                         str(ten_sol_f_time),
+                         str(hundred_sol_stren_f_time),
+                         str(hundred_sol_f_time),
+                         str(huge_sol_stren_f_time),
+                         str(huge_sol_f_time)
+                         ])
 
 
 def test_interval_get_values():

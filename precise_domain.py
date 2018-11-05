@@ -1,6 +1,6 @@
 from stmt import *
 from domain import Domain
-from utils import simplify_and_propagate_ineqs
+from z3_utils import simplify_and_propagate_ineqs
 
 class PreciseDomain(Domain):
 

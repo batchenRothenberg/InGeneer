@@ -2,7 +2,7 @@ import argparse
 import sys
 from z3 import *
 from formula_strengthener import *
-from utils import *
+from z3_utils import *
 import sys as _sys
 
 

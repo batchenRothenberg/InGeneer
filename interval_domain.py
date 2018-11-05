@@ -1,6 +1,6 @@
 from domain import Domain
 from stmt import *
-from utils import *
+from z3_utils import *
 from interval import *
 
 

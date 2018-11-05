@@ -1,6 +1,6 @@
 from z3 import *
 from interval import *
-from utils import remove_or, negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
+from z3_utils import negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
     is_binary, reverse_operator, binary_bool_op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
 
 
@@ -165,3 +165,31 @@ def strengthen(f, model, debug = False):
     else: # f_is_and is an atomic boolean constraint
         res._strengthen_conjunct(f_as_and, model)
     return res
+
+
+def remove_or(f, guiding_model):
+    goal = Goal()
+    goal.add(f)
+    t = Tactic('nnf')
+    nnf_formula = t(goal).as_expr()
+    res = _remove_or_aux(nnf_formula,guiding_model)
+    return res
+
+
+def _remove_or_aux(nnf_formula, guiding_model):
+    # Every sub-formula that isn't an 'or' or an 'and' stops the recursion.
+    # We assume conversion to nnf already removed other operators, such as Implies, Ite, etc.
+    if not is_or(nnf_formula) and not is_and(nnf_formula):
+        return nnf_formula
+    # Step cases:
+    if is_or(nnf_formula):
+        for c in nnf_formula.children():
+            if is_true(guiding_model.evaluate(c)):
+                return _remove_or_aux(c, guiding_model)
+        assert False
+    else:
+        assert is_and(nnf_formula)
+        new_children=[]
+        for c in nnf_formula.children():
+            new_children.append(_remove_or_aux(c,guiding_model))
+        return And(new_children)
