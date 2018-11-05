@@ -170,8 +170,9 @@ def strengthen(f, model, debug = False):
 def remove_or(f, guiding_model):
     goal = Goal()
     goal.add(f)
-    t = Tactic('nnf')
-    nnf_formula = t(goal).as_expr()
+    t_1 = Tactic('nnf')
+    # nnf_formula = t_1(goal).as_expr()
+    nnf_formula = Then(t_1,With('simplify',arith_lhs=True))(goal).as_expr()
     res = _remove_or_aux(nnf_formula,guiding_model)
     return res
 
