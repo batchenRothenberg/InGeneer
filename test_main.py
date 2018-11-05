@@ -10,6 +10,7 @@ from trace import *
 from z3_utils import *
 from general_utils import *
 from generalizer import Generalizer
+import formula_strengthener
 
 x = Int('x')
 y = Int('y')
