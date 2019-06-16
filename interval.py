@@ -5,10 +5,14 @@ MINF = "minf"
 INF = "inf"
 MAXINT = sys.maxsize
 MININT = -sys.maxsize - 1
-_UBOT = u'\u27d8'.encode("utf-8")
-_UTOP = u'\u27d9'.encode("utf-8")
-_UINF = u'\u221E'.encode("utf-8")
-_UIN = u'\u220A'.encode("utf-8")
+# _UBOT = u'\u27d8'.encode("utf-8")
+# _UTOP = u'\u27d9'.encode("utf-8")
+# _UINF = u'\u221E'.encode("utf-8")
+# _UIN = u'\u220A'.encode("utf-8")
+_UBOT = "<bottom>"
+_UTOP = "<top>"
+_UINF = "<infinity>"
+_UIN = "in"
 
 
 def inf_str_to_number(st):
@@ -172,7 +176,7 @@ class Interval:
         l = str(self.low)
         h = str(self.high)
         if self.is_bottom():
-            return u'\u27C2'
+            return _UBOT
         return "[" + l + "," + h + "]"
 
     def __repr__(self):
