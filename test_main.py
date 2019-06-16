@@ -500,6 +500,124 @@ def test_interval_set_get_values():
     print("Printing at most 1000 models of "+str(I_8))
     I_8.print_all_values(limit=1000)
 
+def test_interval_value_in_range():
+    print(str(i_1)+" 3 :"+str(i_1.is_value_in_range(3)))
+    print(str(i_1)+" 2 :"+str(i_1.is_value_in_range(2)))
+    print(str(i_1)+" 4 :"+str(i_1.is_value_in_range(4)))
+    print(str(i_1)+" 5 :"+str(i_1.is_value_in_range(5)))
+    print(str(i_1)+" 6 :"+str(i_1.is_value_in_range(6)))
+    print(str(i_1)+" 16 :"+str(i_1.is_value_in_range(16)))
+    print(str(i_1)+" 64 :"+str(i_1.is_value_in_range(64)))
+    print(str(i_1)+" -64 :"+str(i_1.is_value_in_range(-64)))
+    print(str(i_2)+" -64 :"+str(i_2.is_value_in_range(-64)))
+    print(str(i_2)+" -2 :"+str(i_2.is_value_in_range(-2)))
+    print(str(i_2)+" -3 :"+str(i_2.is_value_in_range(-3)))
+    print(str(i_6)+" -3 :"+str(i_6.is_value_in_range(-3)))
+    print(str(i_6)+" -30 :"+str(i_6.is_value_in_range(-30)))
+    print(str(i_6)+" 15 :"+str(i_6.is_value_in_range(15)))
+    print(str(i_5)+" 15 :"+str(i_5.is_value_in_range(15)))
+    print(str(i_5)+" 15000 :"+str(i_5.is_value_in_range(15000)))
+    print(str(i_5)+" -15 :"+str(i_5.is_value_in_range(-15)))
+    print(str(i_5)+" -3 :"+str(i_5.is_value_in_range(-3)))
+    print(str(i_7)+" -3 :"+str(i_7.is_value_in_range(-3)))
+    print(str(i_7)+" -30 :"+str(i_7.is_value_in_range(-30)))
+    print(str(i_7)+" 83 :"+str(i_7.is_value_in_range(83)))
+    print(str(i_3)+" 83 :"+str(i_3.is_value_in_range(83)))
+    print(str(i_3)+" -83 :"+str(i_3.is_value_in_range(-83)))
+    print(str(i_3)+" 837 :"+str(i_3.is_value_in_range(837)))
+    print(str(i_3)+" 0 :"+str(i_3.is_value_in_range(0)))
+
+
+def test_interval_set_evaluate_under_model():
+    s = Solver()
+    s.add(And(x==4,y==0))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_formula(m))) #true
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(And(x == -4, y == 0))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # false
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #false
+
+    s = Solver()
+    s.add(And(x == 4, y == 8))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # false
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #false
+
+    s = Solver()
+    s.add(And(x == 79, y == -90))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # false
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #false
+
+    s = Solver()
+    s.add(And(x == 3, y == 6))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # true
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(And(x == 4, y == -90, z == 79))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # false
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #false
+
+    s = Solver()
+    s.add(And(x == 4, y == 0, z == 79))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # true
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(z == 79)
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # true
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(And(z == 79,x == 4))
+    s.check()
+    m = s.model()
+    # x in [3,5] y in [-2,6]
+    print(str(I_3) + " " + str(m) + " :" + str(I_3.evaluate_under_model_using_formula(m)))  # true
+    print(str(I_3)+" "+str(m)+" :"+str(I_3.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(And(x==4,y==0))
+    s.check()
+    m = s.model()
+    # top
+    print(str(I_5)+" "+str(m)+" :"+str(I_5.evaluate_under_model_using_formula(m))) #true
+    print(str(I_5)+" "+str(m)+" :"+str(I_5.evaluate_under_model_using_intervals(m))) #true
+
+    s = Solver()
+    s.add(And(x == 4, y == 0))
+    s.check()
+    m = s.model()
+    # bottom
+    print(str(I_6) + " " + str(m) + " :" + str(I_6.evaluate_under_model_using_formula(m)))  # false
+    print(str(I_6) + " " + str(m) + " :" + str(I_6.evaluate_under_model_using_intervals(m)))  # false
+
+
 def main():
     # test_interval()
     # test_interval_set()
@@ -509,7 +627,9 @@ def main():
     # help_simplify()
     # test_sort()
     # test_remove_or()
-    test_formula_strengthener()
+    # test_formula_strengthener()
+    # test_interval_value_in_range()
+    test_interval_set_evaluate_under_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
 
