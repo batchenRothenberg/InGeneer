@@ -257,6 +257,10 @@ class Interval:
                 yield n
                 n = n + 1
 
+    def is_value_in_range(self, value):
+        assert isinstance(value, int)
+        return value >= self.low and value <= self.high
+
 
 class IntervalSet:
 
@@ -366,6 +370,21 @@ class IntervalSet:
             if not interval.is_low_minf():
                 constraints.append(Int(var) >= IntVal(interval.low.n))
         return And(constraints)
+
+    def evaluate_under_model_using_formula(self, model):
+        return model.evaluate(self.as_formula())
+
+    def evaluate_under_model_using_intervals(self, model):
+        if self.is_bottom():
+            return False
+        if self.is_top():
+            return True
+        for var in model.decls():
+            if var.name() in self.dict.keys():
+                if not self.dict[var.name()].is_value_in_range(model[var].as_long()):
+                    return False
+        return True
+
 
 
 def max_of_two_with_minf(n, m):
