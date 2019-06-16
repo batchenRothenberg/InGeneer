@@ -182,14 +182,14 @@ def print_all_models(f, limit=10000):
         count += 1
         m = s.model()
         print(m)
-        s.add(get_formula_from_model(m))
+        s.add(get_blocking_formula_from_model(m))
     if count == limit:
         print("max number of models reached")
     return count
 
 
 # From: https://stackoverflow.com/questions/11867611/z3py-checking-all-solutions-for-equation
-def get_formula_from_model(model):
+def get_blocking_formula_from_model(model):
     block = []
     for d in model:
         # d is a declaration
