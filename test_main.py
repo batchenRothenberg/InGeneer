@@ -618,6 +618,25 @@ def test_interval_set_evaluate_under_model():
     print(str(I_6) + " " + str(m) + " :" + str(I_6.evaluate_under_model_using_intervals(m)))  # false
 
 
+def test_update_model():
+    s = Solver()
+    s.add(f_1)
+    s.check()
+    m = s.model()
+    d = create_dictionary_from_model(m)
+    m_2 = create_model_from_dictionary(d)
+    print(m)
+    print(m_2)
+    m_3 = update_model(m,[(x,7)])
+    print(m_2,m_3)
+    m_3 = update_model(m,[(x,70),(y,70)])
+    print(m_2,m_3)
+    m_3 = update_model(m,[(x,5),(z,6)])
+    print(m_2,m_3)
+    print(m)
+
+
+
 def main():
     # test_interval()
     # test_interval_set()
@@ -629,7 +648,8 @@ def main():
     # test_remove_or()
     # test_formula_strengthener()
     # test_interval_value_in_range()
-    test_interval_set_evaluate_under_model()
+    # test_interval_set_evaluate_under_model()
+    test_update_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
 
