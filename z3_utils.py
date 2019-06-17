@@ -204,6 +204,32 @@ def get_blocking_formula_from_model(model):
     return (Or(block))
 
 
+def create_dictionary_from_model(model):
+    dict = {}
+    for d in model.decls():
+        dict[d.name()]=(d(),model[d].as_long())
+    return dict
+
+
+def create_model_from_dictionary(dict):
+    s = Solver()
+    for var_name in dict.keys():
+            var,value = dict[var_name]
+            s.add(var == value)
+    s.check()
+    return s.model()
+
+
+# list_of_tuples should contain pairs of variables and updated value, e.g.:
+# x = Int(x)
+# update_model(m,[(x,7)]) will update model m s.t. variable x gets value 7 (other variables remain unchanged)
+def update_model(model, list_of_tuples):
+    d = create_dictionary_from_model(model)
+    for var,val in list_of_tuples:
+        d[str(var)]=(var,val)
+    return create_model_from_dictionary(d)
+
+
 def get_children_values(expr, model):
     res = []
     for c in expr.children():
