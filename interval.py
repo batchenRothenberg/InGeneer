@@ -259,7 +259,8 @@ class Interval:
 
     def is_value_in_range(self, value):
         assert isinstance(value, int)
-        return value >= self.low and value <= self.high
+        # Chained operators in Python: https://www.geeksforgeeks.org/chaining-comparison-operators-python/
+        return self.low <= value <= self.high
 
 
 class IntervalSet:
