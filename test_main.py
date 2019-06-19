@@ -636,6 +636,21 @@ def test_update_model():
     print(m)
 
 
+def test_is_var_in_range():
+    print(str(I_1)+" "+str(x)+" 3: "+str(I_1.is_variable_in_range(x,3)))
+    print(str(I_1)+" "+str(x)+" 2: "+str(I_1.is_variable_in_range(x,2)))
+    print(str(I_1)+" "+str(x)+" 30: "+str(I_1.is_variable_in_range(x,30)))
+    print(str(I_1)+" "+str(y)+" 3: "+str(I_1.is_variable_in_range(y,3)))
+    print(str(I_1)+" "+str(y)+" -3: "+str(I_1.is_variable_in_range(y,-3)))
+    print(str(I_1)+" "+str(y)+" -30: "+str(I_1.is_variable_in_range(y,-30)))
+    print(str(I_1)+" "+str(z)+" -30: "+str(I_1.is_variable_in_range(z,-30)))
+    print(str(I_5)+" "+str(y)+" -30: "+str(I_5.is_variable_in_range(y,-30)))
+    print(str(I_6)+" "+str(y)+" -30: "+str(I_6.is_variable_in_range(y,-30)))
+    print(str(I_5)+" "+str(x)+" -30: "+str(I_5.is_variable_in_range(x,-30)))
+    print(str(I_6)+" "+str(x)+" -30: "+str(I_6.is_variable_in_range(x,-30)))
+    print(str(I_5)+" "+str(z)+" -30: "+str(I_5.is_variable_in_range(z,-30)))
+    print(str(I_6)+" "+str(z)+" -30: "+str(I_6.is_variable_in_range(z,-30)))
+
 
 def main():
     # test_interval()
@@ -647,9 +662,10 @@ def main():
     # test_sort()
     # test_remove_or()
     # test_formula_strengthener()
-    # test_interval_value_in_range()
+    test_interval_value_in_range()
+    test_is_var_in_range()
     # test_interval_set_evaluate_under_model()
-    test_update_model()
+    # test_update_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
 
