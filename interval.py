@@ -386,6 +386,16 @@ class IntervalSet:
                     return False
         return True
 
+    # Var should be the variable itself and not its name (e.g., x in "x=Int('x')")
+    def is_variable_in_range(self, var, value):
+        if self.is_bottom():
+            return False
+        if str(var) in self.dict.keys():
+            interval = self.dict[str(var)]
+            return interval.is_value_in_range(value)
+        else:
+            return True
+
 
 
 def max_of_two_with_minf(n, m):
