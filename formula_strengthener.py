@@ -160,6 +160,7 @@ def strengthen(f, model, debug = False):
     if debug:
         print("f_as_and: "+str(f_as_and))
     if is_and(f_as_and):
+        # TODO: consider applying z3 propagate ineqs tactic here
         for c in f_as_and.children():
             res._strengthen_conjunct(c, model)
     else: # f_is_and is an atomic boolean constraint
@@ -186,6 +187,7 @@ def _remove_or_aux(nnf_formula, guiding_model):
     if is_or(nnf_formula):
         for c in nnf_formula.children():
             if is_true(guiding_model.evaluate(c)):
+                # TODO: consider alternative heuristics for picking a clause
                 return _remove_or_aux(c, guiding_model)
         assert False
     else:
