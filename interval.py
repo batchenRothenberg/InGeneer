@@ -322,12 +322,13 @@ class IntervalSet:
         return not self.__eq__(other)
 
     def add_interval(self, var, interval):
+        var_str = str(var)
         if interval.is_top():
             return
-        elif var not in self.dict.keys():
-            self.dict[var] = interval
+        elif var_str not in self.dict.keys():
+            self.dict[var_str] = interval
         else: #var in self.dict.keys()
-            self.dict[var] = self.dict[var].intersect(interval)
+            self.dict[var_str] = self.dict[var_str].intersect(interval)
 
     def print_all_values(self, limit = 100):
         if self.is_bottom():
@@ -396,6 +397,12 @@ class IntervalSet:
         else:
             return True
 
+    # Var should be the variable itself and not its name (e.g., x in "x=Int('x')")
+    def delete_interval(self, var):
+        if self.is_bottom():
+            return
+        if str(var) in self.dict:
+            del self.dict[str(var)]
 
 
 def max_of_two_with_minf(n, m):
