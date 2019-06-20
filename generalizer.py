@@ -41,7 +41,7 @@ class Generalizer:
         for stmt in group:
             if self.debug:
                 print("Doing group step with "+str(stmt))
-            if self.domain.check_sat(formula, stmt, model):
+            if self.domain.does_step_lead_to_state_in_model(formula, stmt, model):
                 formula_i = self.domain.do_step(formula,stmt, model)
                 formulas.append(formula_i)
                 if self.debug:

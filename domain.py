@@ -9,7 +9,7 @@ class Domain:
         pass
 
     @abstractmethod
-    def check_sat(self, formula, stmt, model):
+    def does_step_lead_to_state_in_model(self, formula, stmt, model):
         pass
 
     @abstractmethod

@@ -24,7 +24,7 @@ class IntervalDomain(Domain):
             else:
                 return interval_condition_pre_step(I, cond)
 
-    def check_sat(self, formula, stmt, model):
+    def does_step_lead_to_state_in_model(self, f, stmt, model):
         # todo: IMPLEMENT!
         return True
 

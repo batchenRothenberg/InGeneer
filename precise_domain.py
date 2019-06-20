@@ -18,7 +18,7 @@ class PreciseDomain(Domain):
             wp = simplify_and_propagate_ineqs(wp)
         return wp
 
-    def check_sat(self, formula, stmt, model):
+    def does_step_lead_to_state_in_model(self, formula, stmt, model):
         if model is None:
             return True
         else:
