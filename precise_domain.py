@@ -28,9 +28,11 @@ class PreciseDomain(Domain):
         self.simplification = simpl
 
     def is_bottom(self, formula):
+        #TODO: check unsatisfiability
         return is_false(formula)
 
     def is_top(self, formula):
+        #TODO: check validity
         return is_true(formula)
 
     def intersection(self, formulas):
