@@ -153,6 +153,49 @@ class StrenghenedFormula():
         else:
             self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
 
+    # A Strengthened formula is bottom iff its interval set is bottom
+    # (i.e., contains an illegal interval like [3,2])
+    def is_bottom(self):
+        return self.interval_set.is_bottom()
+
+    # A Strengthened formula is top iff its interval set is top
+    # (i.e., contains no intervals) and it has no unsimplified demands
+    def is_top(self):
+        return self.interval_set.is_top() and len(self.unsimplified_demands)==0
+
+    # A Strengthened formula is bottom iff its interval set is bottom
+    # (i.e., contains an illegal interval like [3,2])
+    @staticmethod
+    def get_bottom(debug=False):
+        res =  StrenghenedFormula(debug)
+        res.interval_set = IntervalSet.get_bottom()
+        return res
+
+    # A Strengthened formula is top iff its interval set is top
+    # (i.e., contains no intervals) and it has no unsimplified demands
+    # This method is essentially the same as __init__, since init returns top
+    @staticmethod
+    def get_top(debug=False):
+        return StrenghenedFormula(debug)
+
+    # Returns a new Strengthed formula instance which is the intersection of self and other.
+    # Self and other are not modified
+    def intersect(self, other):
+        debug = self.debug or other.debug
+        intersection_res = StrenghenedFormula(debug)
+        intersection_res.unsimplified_demands = self.unsimplified_demands + other.unsimplified_demands
+        intersection_res.interval_set = IntervalSet.intersection([self.interval_set,other.interval_set])
+        return intersection_res
+
+    # Returns a new Strengthed formula instance which is the intersection of self and other.
+    # Self and other are not modified
+    @staticmethod
+    def intersection(strengthened_formulas):
+        res = StrenghenedFormula.get_top()
+        for f in strengthened_formulas:
+            res.intersect(f)
+        return res
+
 
 def strengthen(f, model, debug = False):
     res = StrenghenedFormula(debug)
