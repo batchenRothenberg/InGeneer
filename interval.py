@@ -282,6 +282,15 @@ class IntervalSet:
     def __repr__(self):
         return str(self)
 
+    def __contains__(self, item):
+        return str(item) in self.dict
+
+    def get_interval(self, var):
+        if str(var) in self.dict:
+            return self.dict[str(var)]
+        else:
+            return IntervalSet.get_top()
+
     def is_top(self):
         return len(self.dict) == 0
 
