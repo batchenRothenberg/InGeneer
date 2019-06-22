@@ -109,7 +109,7 @@ class StrenghenedFormula():
         elif self.interval_set.is_top():
             return print_all_models(self.get_unsimplified_formula(),limit)
         else:
-            print("Printing all solutions of mixed demands anf intervals")
+            print("Printing all solutions of mixed demands and intervals")
             interval_formula = self.interval_set.as_formula()
             f = And(interval_formula, self.get_unsimplified_formula())
             return print_all_models(f, limit)
