@@ -61,15 +61,16 @@ class IntervalDomain(Domain):
     def _assignment_pre_step(self, f, stmt, model):
         assigned_var = stmt.lhs
         assignment_expr = stmt.rhs
-        if assigned_var not in f.interval_set:
-            return f
-        else:
-            var_interval = f.interval_set.get_interval(assigned_var)
-            f_copy = IntervalSet.get_top().intersect(f)
-            f_copy.delete_interval(assigned_var)
-            cond = And(var_interval.low <= assignment_expr, assignment_expr <= var_interval.high)
-            return self._condition_pre_step(f_copy, cond, model)
+        res = f.__deepcopy__()
+        res.substitute_var_with_expr(assigned_var,assignment_expr)
+        return res
 
     def _condition_pre_step(self, f, cond, model):
-        strengthened_condition =  strengthen(cond,model,self.debug)
-        return StrenghenedFormula.intersection([f,strengthened_condition])
+        res = f.__deepcopy__()
+        res.strengthen_and_add_condition(cond, model)
+        return res
+
+
+
+
+
