@@ -196,6 +196,31 @@ class StrenghenedFormula():
             res.intersect(f)
         return res
 
+    def strengthen_and_add_condition(self, cond, model):
+        strengthened_condition = strengthen(cond, model, self.debug)
+        return self.intersect(strengthened_condition)
+
+    def substitute_var_with_expr(self, var, expr, model):
+        self._substitute_var_in_demands(var, expr)
+        if var not in self.interval_set:
+            return
+        else:
+            var_interval = self.interval_set.get_interval(var)
+            self.interval_set.delete_interval(var)
+            cond = And(var_interval.low <= expr, expr <= var_interval.high)
+            self.strengthen_and_add_condition(cond, model)
+
+    def _substitute_var_in_demands(self, var, expr):
+        new_demands = []
+        for demand in self.unsimplified_demands:
+            new_demand = substitute(demand, [(var, expr)])
+            new_demands.append(new_demand)
+        self.unsimplified_demands = new_demands
+
+    def __deepcopy__(self):
+        return StrenghenedFormula.intersection([self,StrenghenedFormula.get_top()])
+
+
 
 def strengthen(f, model, debug = False):
     res = StrenghenedFormula(debug)
