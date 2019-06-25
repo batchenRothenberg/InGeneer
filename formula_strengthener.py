@@ -148,6 +148,8 @@ class StrenghenedFormula():
                     self._strengthen_mul_by_constant(lhs_arg0_val, lhs_arg1, lhs_arg1_val, op, rhs_value, model)
                 elif is_int_value(lhs_arg1) or is_uminus_on_int_value(lhs_arg1):
                     self._strengthen_mul_by_constant(lhs_arg1_val, lhs_arg0, lhs_arg0_val, op, rhs_value, model)
+                else:
+                    self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
             else:
                 self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
         else:
