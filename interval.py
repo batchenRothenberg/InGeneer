@@ -151,6 +151,10 @@ class IntervalBorder:
         else:
             return inf_str_to_number(INF)
 
+    def get_value(self):
+        assert not self.is_inf() and not self.is_minf()
+        return self.n
+
 
 class Interval:
 
@@ -261,6 +265,15 @@ class Interval:
         assert isinstance(value, int)
         # Chained operators in Python: https://www.geeksforgeeks.org/chaining-comparison-operators-python/
         return self.low <= value <= self.high
+
+    def get_high_value(self):
+        assert not self.is_high_inf()
+        return self.high.get_value()
+
+    def get_low_value(self):
+        assert not self.is_low_minf()
+        return self.low.get_value()
+
 
 
 class IntervalSet:
