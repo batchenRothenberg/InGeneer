@@ -32,7 +32,7 @@ class IntervalDomain(Domain):
                 assignment_expr = stmt.rhs
                 new_value = model.evaluate(assignment_expr)
                 new_model = update_model(model,[(assigned_var,new_value)])
-                return f.interval_set.is_var_in_range(assigned_var,new_value) and new_model.evaluate(And(f.unsimplified_demands))
+                return f.interval_set.is_variable_in_range(assigned_var,new_value) and new_model.evaluate(And(f.unsimplified_demands))
             else:
                 assert stmt.is_condition()
                 cond = stmt.expr
@@ -62,7 +62,7 @@ class IntervalDomain(Domain):
         assigned_var = stmt.lhs
         assignment_expr = stmt.rhs
         res = f.__deepcopy__()
-        res.substitute_var_with_expr(assigned_var,assignment_expr)
+        res.substitute_var_with_expr(assigned_var,assignment_expr,model)
         return res
 
     def _condition_pre_step(self, f, cond, model):
