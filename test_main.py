@@ -690,9 +690,65 @@ def test_delete_interval():
     print("y=8 in range: "+str(top.is_variable_in_range(y,8)))
 
 
+def test_strengthen_interface():
+    s = Solver()
+    f_intervals_x_y = f_6
+    s.add(f_intervals_x_y)
+    s.check()
+    model = s.model()
+    s_f_intervals_x_y = strengthen(f_intervals_x_y,model,True)
+    print("f_intervals_x_y is: " + str(f_intervals_x_y)+" \nand result is: "+str(s_f_intervals_x_y))
+    s.reset()
+    f_unsimplified = And(x*z<=6,x*y+3>=4,5*x%y<9,-z*y<9)
+    s.add(f_unsimplified)
+    s.check()
+    model = s.model()
+    s_f_unsimplified = strengthen(f_unsimplified, model, True)
+    print("f_unsimplified is: " + str(f_unsimplified) + " \nand result is: " + str(s_f_unsimplified))
+    s.reset()
+    f_intervals_x_z = f_7
+    s.add(f_intervals_x_z)
+    s.check()
+    model = s.model()
+    s_f_intervals_x_z = strengthen(f_intervals_x_z,model,True)
+    print("f_intervals_x_z is: " + str(f_intervals_x_z)+" \nand result is: "+str(s_f_intervals_x_z))
+    mixed_x_y = And(x%y==7,y!=0,2*x+5*y<=9,x*y<=7,y<=4)
+    s.reset()
+    s.add(mixed_x_y)
+    s.check()
+    model = s.model()
+    s_mixed_x_y = strengthen(mixed_x_y, model, True)
+    print("mixed_x_y is: " + str(mixed_x_y) + " \nand result is: " + str(s_mixed_x_y))
+    s_f_top = StrenghenedFormula.get_top()
+    print("top: "+str(s_f_top))
+    s_f_bottom = StrenghenedFormula.get_bottom()
+    print("bottom: "+str(s_f_bottom))
+
+    #Intersection
+    s_f_intersect = s_f_intervals_x_y.intersect(s_f_intervals_x_z)
+    print(s_f_intersect) # demands = [] intervals x=[9,inf],y=[-inf,-1],z=[8,inf]
+    s_f_intersect = s_f_intervals_x_y.intersect(s_f_intervals_x_y)
+    print(s_f_intersect) # demands = [] intervals x=[1,inf],y=[-inf,-1]
+    s_f_intersect = s_f_intervals_x_y.intersect(s_f_top)
+    print(s_f_intersect)  # demands = [] intervals x=[1,inf],y=[-inf,-1]
+    print(s_f_intervals_x_y)
+    s_f_intersect = s_f_intervals_x_y.intersect(s_f_bottom)
+    print(s_f_intersect) # demands = [] intervals =<bottom>
+    s_f_intersect = s_f_bottom.intersect(s_f_bottom)
+    print(s_f_intersect) # demands = [] intervals =<bottom>
+    s_f_intersect = s_f_bottom.intersect(s_f_top)
+    print(s_f_intersect) # demands = [] intervals =<bottom>
+    s_f_intersect = s_f_top.intersect(s_f_bottom)
+    print(s_f_intersect) # demands = [] intervals =<bottom>
+    s_f_intersect = s_f_top.intersect(s_f_top)
+    print(s_f_intersect) # demands = [] intervals =<top>
+
+
+
+
 def main():
     # test_interval()
-    test_interval_set()
+    # test_interval_set()
     # test_generalize()
     # test_interval_intersection()
     # describe_tactics()
@@ -706,7 +762,8 @@ def main():
     # test_update_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
-    test_delete_interval() # last test - changes intervalsets
+    # test_delete_interval() # last test - changes intervalsets
+    test_strengthen_interface()
 
 
 if __name__ == "__main__":
