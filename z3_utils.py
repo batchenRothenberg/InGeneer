@@ -220,6 +220,15 @@ def create_model_from_dictionary(dict):
     return s.model()
 
 
+def get_model_from_SSA_trace(trace):
+    s = Solver()
+    f = []
+    for stmt in trace:
+        f.append(stmt.expr)
+    s.add(And(f))
+    s.check()
+    return s.model()
+
 # list_of_tuples should contain pairs of variables and updated value, e.g.:
 # x = Int(x)
 # update_model(m,[(x,7)]) will update model m s.t. variable x gets value 7 (other variables remain unchanged)
