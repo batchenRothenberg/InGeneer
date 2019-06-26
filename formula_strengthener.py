@@ -206,7 +206,12 @@ class StrenghenedFormula():
         else:
             var_interval = self.interval_set.get_interval(var)
             self.interval_set.delete_interval(var)
-            cond = And(var_interval.low <= expr, expr <= var_interval.high)
+            if var_interval.is_high_inf():
+                cond = var_interval.get_low_value() <= expr
+            elif var_interval.is_low_minf():
+                cond = expr <= var_interval.get_high_value()
+            else:
+                cond = And(var_interval.get_low_value() <= expr, expr <= var_interval.get_high_value())
             self.strengthen_and_add_condition(cond, model)
 
     def _substitute_var_in_demands(self, var, expr):
