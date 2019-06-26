@@ -180,14 +180,11 @@ class StrenghenedFormula():
     def get_top(debug=False):
         return StrenghenedFormula(debug)
 
-    # Returns a new Strengthed formula instance which is the intersection of self and other.
-    # Self and other are not modified
+    # Modifies self to be the intersection of self and other.
+    # Other is not modified
     def intersect(self, other):
-        debug = self.debug or other.debug
-        intersection_res = StrenghenedFormula(debug)
-        intersection_res.unsimplified_demands = self.unsimplified_demands + other.unsimplified_demands
-        intersection_res.interval_set = IntervalSet.intersection([self.interval_set,other.interval_set])
-        return intersection_res
+        self.unsimplified_demands = self.unsimplified_demands + other.unsimplified_demands
+        self.interval_set.intersect(other.interval_set)
 
     # Returns a new Strengthed formula instance which is the intersection of self and other.
     # Self and other are not modified
@@ -200,7 +197,7 @@ class StrenghenedFormula():
 
     def strengthen_and_add_condition(self, cond, model):
         strengthened_condition = strengthen(cond, model, self.debug)
-        return self.intersect(strengthened_condition)
+        self.intersect(strengthened_condition)
 
     def substitute_var_with_expr(self, var, expr, model):
         self._substitute_var_in_demands(var, expr)
