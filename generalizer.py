@@ -13,6 +13,8 @@ class Generalizer:
     def generalize_trace(self, multitrace, initial_formula="default", model = None, record_annotation=False, print_annotation=False):
         self.safe_statements_set = set()
         self._generalize(multitrace, initial_formula, model, self.do_group_step, record_annotation, print_annotation)
+        if self.debug:
+            print("Safe statements: "+str(self.safe_statements_set))
         return self.safe_statements_set
 
     def _generalize(self, abstract_trace, initial_formula, model, step_function, record_annotation, print_annotation):
