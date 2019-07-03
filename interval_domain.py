@@ -30,9 +30,15 @@ class IntervalDomain(Domain):
             if stmt.is_assignment():
                 assigned_var = stmt.lhs
                 assignment_expr = stmt.rhs
-                new_value = model.evaluate(assignment_expr).as_long()
-                new_model = update_model(model,[(assigned_var,new_value)])
-                return f.interval_set.is_variable_in_range(assigned_var,new_value) and new_model.evaluate(And(f.unsimplified_demands))
+                if is_int(assigned_var) or is_bv(assigned_var):
+                    new_value = model.evaluate(assignment_expr).as_long()
+                    new_model = update_model(model,[(assigned_var,new_value)])
+                    return f.interval_set.is_variable_in_range(assigned_var,new_value) and is_true(new_model.evaluate(And(f.unsimplified_demands)))
+                else:
+                    assert is_bool(assigned_var)
+                    old_value = is_true(model.evaluate(assigned_var))
+                    new_value = is_true(model.evaluate(assignment_expr))
+                    return old_value == new_value
             else:
                 assert stmt.is_condition()
                 cond = stmt.expr
@@ -61,9 +67,17 @@ class IntervalDomain(Domain):
     def _assignment_pre_step(self, f, stmt, model):
         assigned_var = stmt.lhs
         assignment_expr = stmt.rhs
-        res = f.__deepcopy__()
-        res.substitute_var_with_expr(assigned_var,assignment_expr,model)
-        return res
+        if is_bool(assigned_var):
+            if is_true(model.evaluate(assigned_var)):
+                return self._condition_pre_step(f, assignment_expr, model)
+            else:
+                assert is_false(model.evaluate(assigned_var))
+                return self._condition_pre_step(f, Not(assignment_expr), model)
+        else:
+            assert (is_int(assigned_var) or is_bv(assigned_var))
+            res = f.__deepcopy__()
+            res.substitute_var_with_expr(assigned_var,assignment_expr,model)
+            return res
 
     def _condition_pre_step(self, f, cond, model):
         res = f.__deepcopy__()
