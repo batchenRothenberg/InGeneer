@@ -627,12 +627,14 @@ def test_update_model():
     m_2 = create_model_from_dictionary(d)
     print(m)
     print(m_2)
-    m_3 = update_model(m,[(x,7)])
+    m_3 = update_model(m,[(x,IntVal(7))])
     print(m_2,m_3)
-    m_3 = update_model(m,[(x,70),(y,70)])
+    m_3 = update_model(m,[(x,70),(y,IntVal(70))])
     print(m_2,m_3)
-    m_3 = update_model(m,[(x,5),(z,6)])
+    m_3 = update_model(m,[(x,IntVal(5)),(z,IntVal(6))])
     print(m_2,m_3)
+    m_4 = update_model(m_3, [(x,-5)])
+    print(m_4)
     print(m)
 
 
@@ -757,13 +759,13 @@ def main():
     # test_remove_or()
     # test_formula_strengthener()
     # test_interval_value_in_range()
-    # test_is_var_in_range()
+    test_is_var_in_range()
     # test_interval_set_evaluate_under_model()
     # test_update_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
     # test_delete_interval() # last test - changes intervalsets
-    test_strengthen_interface()
+    # test_strengthen_interface()
 
 
 if __name__ == "__main__":

@@ -207,7 +207,7 @@ def get_blocking_formula_from_model(model):
 def create_dictionary_from_model(model):
     dict = {}
     for d in model.decls():
-        dict[d.name()]=(d(),model[d].as_long())
+        dict[d.name()] = (d(), model[d])
     return dict
 
 
@@ -229,9 +229,10 @@ def get_model_from_SSA_trace(trace):
     s.check()
     return s.model()
 
-# list_of_tuples should contain pairs of variables and updated value, e.g.:
+# list_of_tuples should contain pairs of variables and updated values, as z3 objects, e.g.:
 # x = Int(x)
-# update_model(m,[(x,7)]) will update model m s.t. variable x gets value 7 (other variables remain unchanged)
+# update_model(m,[(x,IntVal(7))]) will update model m s.t. variable x gets value 7 (other variables remain unchanged)
+# also update_model(m,[(x,7)]) will work
 def update_model(model, list_of_tuples):
     d = create_dictionary_from_model(model)
     for var,val in list_of_tuples:
