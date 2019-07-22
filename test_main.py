@@ -746,6 +746,43 @@ def test_strengthen_interface():
     print(s_f_intersect) # demands = [] intervals =<top>
 
 
+def test_arith_lhs():
+    x = BitVec('x',32)
+    y = BitVec('y',32)
+    z = BitVec('z',32)
+    a = BitVecVal(-1, 32)
+    b = BitVecVal(1, 32)
+    print(simplify(a<=x))
+    print(simplify(a<=x,arith_lhs=True))
+    print(simplify(y<=x,arith_lhs=True))
+    print(simplify(y<=x+z,arith_lhs=True))
+    print(simplify(a+b==x,arith_lhs=True))
+    print(simplify(a-b==x,arith_lhs=True))
+    print(simplify(a-b<=x,arith_lhs=True))
+    print(simplify(a+x<=b+2*x,arith_lhs=True))
+    print(simplify((a-x)+(y-b)+b<0,arith_lhs=True))
+    print(simplify((a-x)+(y-b)+b<0,arith_lhs=False))
+    print(simplify((a-x)+(y-b)<a-(x+y)-b,arith_lhs=True))
+    print(simplify((a-x)+(y-b)<a-(x+y)-b,bv_sort_ac=True))
+    print(simplify(x-a<y-b,arith_lhs=True))
+    negate_condition(x>=b)
+
+
+def test_bitvector_simplify():
+    x = BitVec('x',32)
+    y = BitVec('y',32)
+    z = BitVec('z',32)
+    w = BitVec('w',32)
+    a = BitVecVal(-1, 32)
+    b = BitVecVal(1, 32)
+    c = BitVecVal(58,32)
+    d = BitVecVal(-9000,32)
+    print("x==y:\n"+str(bitvector_simplify(x==y)))
+    print("x+a<=y+b:\n"+str(bitvector_simplify(x+a<=y+b)))
+    print("x*z>=y:\n"+str(bitvector_simplify(x*z>=y)))
+    print("x!=0:\n"+str(bitvector_simplify(x!=0)))
+    print("0==y:\n"+str(bitvector_simplify(0==y)))
+    print("a+a+x+-w+-b<2*b:\n"+str(bitvector_simplify(a+a+x+-w+-b<2*b)))
 
 
 def main():
@@ -759,14 +796,15 @@ def main():
     # test_remove_or()
     # test_formula_strengthener()
     # test_interval_value_in_range()
-    test_is_var_in_range()
+    # test_is_var_in_range()
     # test_interval_set_evaluate_under_model()
     # test_update_model()
     # test_interval_get_values()
     # test_interval_set_get_values()
     # test_delete_interval() # last test - changes intervalsets
     # test_strengthen_interface()
-
+    test_arith_lhs()
+    test_bitvector_simplify()
 
 if __name__ == "__main__":
     main()
