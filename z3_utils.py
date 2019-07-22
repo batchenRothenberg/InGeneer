@@ -80,17 +80,17 @@ def negate_condition(cond):
     else:
         arg0 = cond.arg(0)
         arg1 = cond.arg(1)
-        if is_le(cond):
+        if is_le_or_sle(cond):
             return arg0 > arg1
-        if is_lt(cond):
+        if is_lt_or_slt(cond):
             return arg0 >= arg1
-        if is_ge(cond):
+        if is_ge_or_sge(cond):
             return arg0 < arg1
-        if is_gt(cond):
+        if is_gt_or_sgt(cond):
             return arg0 <= arg1
-        if is_eq(cond):
+        if is_eq_or_seq(cond):
             return arg0 != arg1
-        if is_distinct(cond):
+        if is_distinct_or_sdistinct(cond):
             return arg0 == arg1
         else:
             print("WARNING: could not negate condition " + str(cond))
@@ -114,7 +114,12 @@ def is_sgeq(c):
 
 
 def is_binary_boolean(c):
-    return is_lt(c) or is_le(c) or is_gt(c) or is_ge(c) or is_eq(c) or is_distinct(c)
+    return is_lt_or_slt(c) \
+            or is_le_or_sle(c) \
+            or is_gt_or_sgt(c) \
+            or is_ge_or_sge(c) \
+            or is_eq_or_seq(c) \
+            or is_distinct_or_sdistinct(c)
 
 
 def is_binary(expr):
@@ -148,43 +153,45 @@ def get_op(expr):
 
 
 def build_binary_expression(lhs, rhs, op):
-    if op == Z3_OP_LE:
+    if op in Z3_LE_OPS:
         return lhs <= rhs
-    elif op == Z3_OP_LT:
+    elif op in Z3_LT_OPS:
         return lhs < rhs
-    elif op == Z3_OP_GE:
+    elif op in Z3_GE_OPS:
         return lhs >= rhs
-    elif op == Z3_OP_GT:
+    elif op in Z3_GT_OPS:
         return lhs > rhs
-    elif op == Z3_OP_EQ:
+    elif op in Z3_EQ_OPS:
         return lhs == rhs
-    elif op == Z3_OP_DISTINCT:
+    elif op in Z3_DISTINCT_OPS:
         return lhs != rhs
-    elif op == Z3_OP_ADD:
+    elif op in Z3_ADD_OPS:
         return lhs + rhs
-    elif op == Z3_OP_SUB:
+    elif op in Z3_SUB_OPS:
         return lhs - rhs
-    elif op == Z3_OP_MUL:
+    elif op in Z3_MUL_OPS:
         return lhs * rhs
-    elif op == Z3_OP_DIV:
+    elif op in Z3_DIV_OPS:
         return lhs / rhs
+    elif op in Z3_REM_OPS or op in Z3_MOD_OPS:
+        return lhs % rhs
     else:
         print("warning Unssoported operator")
         return None
 
 
 def binary_bool_op_to_string(op):
-    if op == Z3_OP_LE:
+    if op in Z3_LE_OPS:
         return "<="
-    elif op == Z3_OP_LT:
+    elif op in Z3_LT_OPS:
         return "<"
-    elif op == Z3_OP_GE:
+    elif op in Z3_GE_OPS:
         return ">="
-    elif op == Z3_OP_GT:
+    elif op in Z3_GT_OPS:
         return ">"
-    elif op == Z3_OP_EQ:
+    elif op in Z3_EQ_OPS:
         return "=="
-    elif op == Z3_OP_DISTINCT:
+    elif op in Z3_DISTINCT_OPS:
         return "!="
     else:
         print("warning Unssoported operator")
@@ -200,6 +207,14 @@ def reverse_operator(op):
         return Z3_OP_LE
     elif op == Z3_OP_GT:
         return Z3_OP_LT
+    elif op == Z3_OP_SLEQ:
+        return Z3_OP_SGEQ
+    elif op == Z3_OP_SLT:
+        return Z3_OP_SGT
+    elif op == Z3_OP_SGEQ:
+        return Z3_OP_SLEQ
+    elif op == Z3_OP_SGT:
+        return Z3_OP_SLT
     elif op == Z3_OP_EQ:
         return Z3_OP_EQ
     elif op == Z3_OP_DISTINCT:

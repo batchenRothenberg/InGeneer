@@ -38,15 +38,15 @@ class StrenghenedFormula():
             self.add_unsimplified_demand(conjunct)
 
     def _add_interval_for_binary_boolean(self, var, var_value, rhs_value, op):
-        if op == Z3_OP_LE:
+        if op in Z3_LE_OPS:
             self.add_interval(str(var), Interval(MINF, rhs_value))
-        elif op == Z3_OP_LT:
+        elif op in Z3_LT_OPS:
             self.add_interval(str(var), Interval(MINF, rhs_value - 1))
-        elif op == Z3_OP_GE:
+        elif op in Z3_GE_OPS:
             self.add_interval(str(var), Interval(rhs_value, INF))
-        elif op == Z3_OP_GT:
+        elif op in Z3_GT_OPS:
             self.add_interval(str(var), Interval(rhs_value + 1, INF))
-        elif op == Z3_OP_EQ:
+        elif op in Z3_EQ_OPS:
             self.add_interval(str(var), Interval(rhs_value, rhs_value))
         else:
             assert False
@@ -61,7 +61,7 @@ class StrenghenedFormula():
 
     def _strengthen_add(self, lhs_children, lhs_children_values, op, rhs_value, model):
         num_children = len(lhs_children)
-        if op == Z3_OP_LE:
+        if op in Z3_LE_OPS:
             lhs_value = sum(lhs_children_values)
             diff = rhs_value - lhs_value
             assert diff >= 0
@@ -78,9 +78,10 @@ class StrenghenedFormula():
                 value_i = lhs_children_values[i]
                 self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i + minimal_addition, op, model)
                 i += 1
-        elif op == Z3_OP_LT:
-            self._strengthen_add(lhs_children, lhs_children_values, Z3_OP_LE, rhs_value - 1, model)
-        elif op == Z3_OP_GE:
+        elif op in Z3_LT_OPS:
+            nonstrict_op = strict_to_nonstrict_bool_op(op)
+            self._strengthen_add(lhs_children, lhs_children_values, nonstrict_op, rhs_value - 1, model)
+        elif op in Z3_GE_OPS:
             lhs_value = sum(lhs_children_values)
             diff = lhs_value - rhs_value
             assert diff >= 0
@@ -99,9 +100,9 @@ class StrenghenedFormula():
                 self._strengthen_binary_boolean_conjunct(lhs_children[i], value_i, value_i - minimal_subtraction, op,
                                                          model)
                 i += 1
-        elif op == Z3_OP_GT:
+        elif op in Z3_GT_OPS:
             self._strengthen_add(lhs_children, lhs_children_values, Z3_OP_GE, rhs_value + 1, model)
-        elif op == Z3_OP_EQ:
+        elif op in Z3_EQ_OPS:
             for i in range(0,num_children-1):
                 self._strengthen_binary_boolean_conjunct(lhs_children[i], lhs_children_values[i], lhs_children_values[i], op, model)
 
@@ -122,18 +123,18 @@ class StrenghenedFormula():
     def _strengthen_mul_by_constant(self, constant, var, var_value, op, rhs_value, model):
         division_rounded_down = rhs_value // constant
         if constant > 0:
-            should_round_up = (op == Z3_OP_GE or op == Z3_OP_GT) and rhs_value % constant != 0
+            should_round_up = (op in Z3_GE_OPS or op in Z3_GT_OPS) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, op, model)
         elif constant < 0:
             reversed_op = reverse_operator(op)
-            should_round_up = (reversed_op == Z3_OP_GE or reversed_op == Z3_OP_GT) and rhs_value % constant != 0
+            should_round_up = (reversed_op in Z3_GE_OPS or reversed_op in Z3_GT_OPS) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, reversed_op, model)
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
             print("Strnghening: " + str(lhs) + " " + binary_bool_op_to_string(op) + " " + str(rhs_value))
-        if op == Z3_OP_DISTINCT:
-            ineq_op = self._replace_distinct_with_ineq(lhs_value, rhs_value)
+        if op in Z3_DISTINCT_OPS:
+            ineq_op = self._replace_distinct_with_ineq(lhs, lhs_value, rhs_value)
             self._strengthen_binary_boolean_conjunct(lhs, lhs_value, rhs_value, ineq_op, model)
             return
         if is_const(lhs):
@@ -146,9 +147,9 @@ class StrenghenedFormula():
             self._strengthen_add(lhs.children(), children_values, op, rhs_value, model)
         elif is_binary(lhs):
             lhs_arg0, lhs_arg1, lhs_arg0_val, lhs_arg1_val, lhs_op = evaluate_binary_expr(lhs, model)
-            if lhs_op == Z3_OP_SUB:
+            if lhs_op in Z3_SUB_OPS:
                 self._strengthen_add([lhs_arg0,-lhs_arg1],[lhs_arg0_val,-lhs_arg1_val], op, rhs_value, model)
-            elif lhs_op == Z3_OP_MUL:
+            elif lhs_op in Z3_MUL_OPS:
                 if is_int_value(lhs_arg0) or is_uminus_on_int_value(lhs_arg0):
                     self._strengthen_mul_by_constant(lhs_arg0_val, lhs_arg1, lhs_arg1_val, op, rhs_value, model)
                 elif is_int_value(lhs_arg1) or is_uminus_on_int_value(lhs_arg1):
