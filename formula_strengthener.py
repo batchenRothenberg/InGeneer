@@ -150,9 +150,9 @@ class StrenghenedFormula():
             if lhs_op in Z3_SUB_OPS:
                 self._strengthen_add([lhs_arg0,-lhs_arg1],[lhs_arg0_val,-lhs_arg1_val], op, rhs_value, model)
             elif lhs_op in Z3_MUL_OPS:
-                if is_int_value(lhs_arg0) or is_uminus_on_int_value(lhs_arg0):
+                if is_numeral_constant(lhs_arg0):
                     self._strengthen_mul_by_constant(lhs_arg0_val, lhs_arg1, lhs_arg1_val, op, rhs_value, model)
-                elif is_int_value(lhs_arg1) or is_uminus_on_int_value(lhs_arg1):
+                elif is_numeral_constant(lhs_arg1):
                     self._strengthen_mul_by_constant(lhs_arg1_val, lhs_arg0, lhs_arg0_val, op, rhs_value, model)
                 else:
                     self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
