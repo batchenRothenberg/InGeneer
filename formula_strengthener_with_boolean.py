@@ -1,7 +1,7 @@
 from z3 import *
 from interval import *
 from z3_utils import negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
-    is_binary, reverse_operator, binary_bool_op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
+    is_binary, reverse_boolean_operator, binary_bool_op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
 
 
 class StrenghenedFormula():
@@ -136,7 +136,7 @@ class StrenghenedFormula():
             should_round_up = (op == Z3_OP_GE or op == Z3_OP_GT) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, op, model)
         elif constant < 0:
-            reversed_op = reverse_operator(op)
+            reversed_op = reverse_boolean_operator(op)
             should_round_up = (reversed_op == Z3_OP_GE or reversed_op == Z3_OP_GT) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, reversed_op, model)
 
@@ -151,7 +151,7 @@ class StrenghenedFormula():
             self._add_interval_for_binary_boolean(lhs, lhs_value, rhs_value, op)
         elif is_app_of(lhs, Z3_OP_UMINUS):
             arg0 = lhs.arg(0)
-            self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_operator(op), model)
+            self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_boolean_operator(op), model)
         elif is_app_of(lhs, Z3_OP_ADD):
             children_values = get_children_values(lhs, model)
             self._strengthen_add(lhs.children(), children_values, op, rhs_value, model)

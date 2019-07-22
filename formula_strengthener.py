@@ -125,7 +125,7 @@ class StrenghenedFormula():
             should_round_up = (op in Z3_GE_OPS or op in Z3_GT_OPS) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, op, model)
         elif constant < 0:
-            reversed_op = reverse_operator(op)
+            reversed_op = reverse_boolean_operator(op)
             should_round_up = (reversed_op in Z3_GE_OPS or reversed_op in Z3_GT_OPS) and rhs_value % constant != 0
             self._strengthen_binary_boolean_conjunct(var, var_value, division_rounded_down + should_round_up, reversed_op, model)
 
@@ -140,7 +140,7 @@ class StrenghenedFormula():
             self._add_interval_for_binary_boolean(lhs, lhs_value, rhs_value, op)
         elif is_app_of(lhs, Z3_OP_UMINUS):
             arg0 = lhs.arg(0)
-            self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_operator(op), model)
+            self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_boolean_operator(op), model)
         elif is_app_of(lhs, Z3_OP_ADD):
             children_values = get_children_values(lhs, model)
             self._strengthen_add(lhs.children(), children_values, op, rhs_value, model)

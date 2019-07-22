@@ -198,7 +198,7 @@ def binary_bool_op_to_string(op):
         return None
 
 
-def reverse_operator(op):
+def reverse_boolean_operator(op):
     if op == Z3_OP_LE:
         return Z3_OP_GE
     elif op == Z3_OP_LT:
