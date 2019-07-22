@@ -51,12 +51,12 @@ class StrenghenedFormula():
             assert False
 
     @staticmethod
-    def _replace_distinct_with_ineq(lhs_value, rhs_value):
+    def _replace_distinct_with_ineq(lhs, lhs_value, rhs_value):
         if lhs_value > rhs_value:
-            return Z3_OP_GT
+            return get_op(lhs>rhs_value)
         else:
             assert lhs_value < rhs_value
-            return Z3_OP_LT
+            return get_op(lhs<rhs_value)
 
     def _strengthen_add(self, lhs_children, lhs_children_values, op, rhs_value, model):
         num_children = len(lhs_children)
@@ -100,7 +100,8 @@ class StrenghenedFormula():
                                                          model)
                 i += 1
         elif op in Z3_GT_OPS:
-            self._strengthen_add(lhs_children, lhs_children_values, Z3_OP_GE, rhs_value + 1, model)
+            nonstrict_op = strict_to_nonstrict_bool_op(op)
+            self._strengthen_add(lhs_children, lhs_children_values, nonstrict_op, rhs_value + 1, model)
         elif op in Z3_EQ_OPS:
             for i in range(0,num_children-1):
                 self._strengthen_binary_boolean_conjunct(lhs_children[i], lhs_children_values[i], lhs_children_values[i], op, model)
@@ -141,7 +142,7 @@ class StrenghenedFormula():
         elif is_app_of(lhs, Z3_OP_UMINUS):
             arg0 = lhs.arg(0)
             self._strengthen_binary_boolean_conjunct(arg0, -lhs_value, -rhs_value, reverse_boolean_operator(op), model)
-        elif is_app_of(lhs, Z3_OP_ADD):
+        elif get_op(lhs) in Z3_ADD_OPS:
             children_values = get_children_values(lhs, model)
             self._strengthen_add(lhs.children(), children_values, op, rhs_value, model)
         elif is_binary(lhs):
@@ -236,7 +237,7 @@ def strengthen(f, model, debug = False):
     f_as_and = remove_or(f, model)
     if debug:
         print("f_as_and: "+str(f_as_and))
-    if is_and(f_as_and):
+    if get_op(f_as_and) in Z3_AND_OPS:
         # TODO: consider applying z3 propagate ineqs tactic here
         for c in f_as_and.children():
             res._strengthen_conjunct(c, model)
@@ -256,19 +257,20 @@ def remove_or(f, guiding_model):
 
 
 def _remove_or_aux(nnf_formula, guiding_model):
+    nnf_op = get_op(nnf_formula)
     # Every sub-formula that isn't an 'or' or an 'and' stops the recursion.
     # We assume conversion to nnf already removed other operators, such as Implies, Ite, etc.
-    if not is_or(nnf_formula) and not is_and(nnf_formula):
+    if not nnf_op in Z3_OR_OPS and not nnf_op in Z3_AND_OPS:
         return nnf_formula
     # Step cases:
-    if is_or(nnf_formula):
+    if nnf_op in Z3_OR_OPS:
         for c in nnf_formula.children():
             if model_evaluate_to_const(c,guiding_model):
                 # TODO: consider alternative heuristics for picking a clause
                 return _remove_or_aux(c, guiding_model)
         assert False
     else:
-        assert is_and(nnf_formula)
+        assert nnf_op in Z3_AND_OPS
         new_children=[]
         for c in nnf_formula.children():
             new_children.append(_remove_or_aux(c,guiding_model))

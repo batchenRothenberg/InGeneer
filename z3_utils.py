@@ -144,7 +144,7 @@ def evaluate_binary_expr(expr, model):
     arg1 = expr.arg(1)
     arg1_value = model_evaluate_to_const(arg1, model)
     arg0_value = model_evaluate_to_const(arg0, model)
-    op = expr.decl().kind()
+    op = get_op(expr)
     return arg0, arg1, arg0_value, arg1_value, op
 
 
