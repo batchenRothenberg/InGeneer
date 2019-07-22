@@ -137,8 +137,8 @@ def evaluate_binary_expr(expr, model):
     assert len(expr.children()) == 2
     arg0 = expr.arg(0)
     arg1 = expr.arg(1)
-    arg1_value = model.evaluate(arg1).as_long()
-    arg0_value = model.evaluate(arg0).as_long()
+    arg1_value = model_evaluate_to_const(arg1, model)
+    arg0_value = model_evaluate_to_const(arg0, model)
     op = expr.decl().kind()
     return arg0, arg1, arg0_value, arg1_value, op
 
@@ -352,7 +352,7 @@ def update_model(model, list_of_tuples):
 def get_children_values(expr, model):
     res = []
     for c in expr.children():
-        res.append(model.evaluate(c).as_long())
+        res.append(model_evaluate_to_const(c,model))
     return res
 
 

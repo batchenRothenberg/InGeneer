@@ -263,7 +263,7 @@ def _remove_or_aux(nnf_formula, guiding_model):
     # Step cases:
     if is_or(nnf_formula):
         for c in nnf_formula.children():
-            if is_true(guiding_model.evaluate(c)):
+            if model_evaluate_to_const(c,guiding_model):
                 # TODO: consider alternative heuristics for picking a clause
                 return _remove_or_aux(c, guiding_model)
         assert False

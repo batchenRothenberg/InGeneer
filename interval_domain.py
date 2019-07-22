@@ -31,18 +31,18 @@ class IntervalDomain(Domain):
                 assigned_var = stmt.lhs
                 assignment_expr = stmt.rhs
                 if is_int(assigned_var) or is_bv(assigned_var):
-                    new_value = model.evaluate(assignment_expr).as_long()
+                    new_value = model_evaluate_to_const(assignment_expr,model)
                     new_model = update_model(model,[(assigned_var,new_value)])
-                    return f.interval_set.is_variable_in_range(assigned_var,new_value) and is_true(new_model.evaluate(And(f.unsimplified_demands)))
+                    return f.interval_set.is_variable_in_range(assigned_var,new_value) and model_evaluate_to_const(And(f.unsimplified_demands),new_model)
                 else:
                     assert is_bool(assigned_var)
-                    old_value = is_true(model.evaluate(assigned_var))
-                    new_value = is_true(model.evaluate(assignment_expr))
+                    old_value = model_evaluate_to_const(assigned_var,model)
+                    new_value = model_evaluate_to_const(assignment_expr,model)
                     return old_value == new_value
             else:
                 assert stmt.is_condition()
                 cond = stmt.expr
-                return is_true(model.evaluate(cond))
+                return model_evaluate_to_const(cond,model)
 
     def is_bottom(self, f):
         return f.is_bottom()
@@ -68,10 +68,9 @@ class IntervalDomain(Domain):
         assigned_var = stmt.lhs
         assignment_expr = stmt.rhs
         if is_bool(assigned_var):
-            if is_true(model.evaluate(assigned_var)):
+            if model_evaluate_to_const(assigned_var,model):
                 return self._condition_pre_step(f, assignment_expr, model)
             else:
-                assert is_false(model.evaluate(assigned_var))
                 return self._condition_pre_step(f, Not(assignment_expr), model)
         else:
             assert (is_int(assigned_var) or is_bv(assigned_var))
