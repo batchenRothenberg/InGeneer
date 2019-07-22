@@ -155,11 +155,11 @@ class StrenghenedFormula():
                 elif is_numeral_constant(lhs_arg1):
                     self._strengthen_mul_by_constant(lhs_arg1_val, lhs_arg0, lhs_arg0_val, op, rhs_value, model)
                 else:
-                    self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
+                    self.add_unsimplified_demand(build_binary_expression(lhs, rhs_value, op))
             else:
-                self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
+                self.add_unsimplified_demand(build_binary_expression(lhs, rhs_value, op))
         else:
-            self.add_unsimplified_demand(build_binary_expression(lhs, IntVal(rhs_value), op))
+            self.add_unsimplified_demand(build_binary_expression(lhs, rhs_value, op))
 
     # A Strengthened formula is bottom iff its interval set is bottom
     # (i.e., contains an illegal interval like [3,2])
