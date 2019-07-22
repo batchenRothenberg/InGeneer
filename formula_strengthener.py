@@ -24,8 +24,7 @@ class StrenghenedFormula():
     def _strengthen_conjunct(self, conjunct, model):
         if is_not(conjunct):
             argument = conjunct.arg(0)
-            if is_bool(argument):
-                assert is_const(argument)
+            if is_const(argument):
                 return # ignore boolean literals
             else:
                 self._strengthen_conjunct(negate_condition(conjunct.arg(0)), model)
