@@ -234,7 +234,7 @@ class StrenghenedFormula():
 
 def strengthen(f, model, debug = False):
     res = StrenghenedFormula(debug)
-    f_as_and = remove_or(f, model)
+    f_as_and = nnf_simplify_and_remove_or(f, model)
     if debug:
         print("f_as_and: "+str(f_as_and))
     if get_op(f_as_and) in Z3_AND_OPS:
@@ -246,7 +246,7 @@ def strengthen(f, model, debug = False):
     return res
 
 
-def remove_or(f, guiding_model):
+def nnf_simplify_and_remove_or(f, guiding_model):
     goal = Goal()
     goal.add(f)
     t_1 = Tactic('nnf')
