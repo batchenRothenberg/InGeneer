@@ -1,3 +1,5 @@
+import cProfile, pstats, io, re
+import StringIO
 from abc import ABCMeta, abstractmethod
 import csv
 
@@ -61,3 +63,16 @@ class TopologicalSort():
         return res
 
 
+def start_profiling():
+    pr = cProfile.Profile()
+    pr.enable()
+    return pr
+
+
+def stop_profiling(pr):
+    pr.disable()
+    s = StringIO.StringIO()
+    sortby = 'cumulative'
+    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+    ps.print_stats()
+    print s.getvalue()
