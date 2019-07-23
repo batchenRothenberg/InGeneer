@@ -152,6 +152,10 @@ def get_op(expr):
     return expr.decl().kind()
 
 
+def get_id(expr):
+    return expr.get_id()
+
+
 def build_binary_expression(lhs, rhs, op):
     if op in Z3_LE_OPS:
         return lhs <= rhs
