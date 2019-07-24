@@ -252,7 +252,7 @@ def nnf_simplify_and_remove_or(f, guiding_model):
     t_1 = Tactic('nnf')
     # nnf_formula = t_1(goal).as_expr()
     nnf_formula = Then(t_1,With('simplify',arith_lhs=True))(goal).as_expr()
-    res = _remove_or_aux(nnf_formula,guiding_model)
+    res = remove_or(nnf_formula, guiding_model)
     return res
 
 
@@ -264,7 +264,7 @@ def nnf_simplify(f):
     return nnf_formula
 
 
-def _remove_or_aux(nnf_formula, guiding_model):
+def remove_or(nnf_formula, guiding_model):
     nnf_op = get_op(nnf_formula)
     # Every sub-formula that isn't an 'or' or an 'and' stops the recursion.
     # We assume conversion to nnf already removed other operators, such as Implies, Ite, etc.
@@ -275,11 +275,11 @@ def _remove_or_aux(nnf_formula, guiding_model):
         for c in nnf_formula.children():
             if model_evaluate_to_const(c,guiding_model):
                 # TODO: consider alternative heuristics for picking a clause
-                return _remove_or_aux(c, guiding_model)
+                return remove_or(c, guiding_model)
         assert False
     else:
         assert nnf_op in Z3_AND_OPS
         new_children=[]
         for c in nnf_formula.children():
-            new_children.append(_remove_or_aux(c,guiding_model))
+            new_children.append(remove_or(c, guiding_model))
         return And(new_children)
