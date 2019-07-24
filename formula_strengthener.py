@@ -256,6 +256,14 @@ def nnf_simplify_and_remove_or(f, guiding_model):
     return res
 
 
+def nnf_simplify(f):
+    goal = Goal()
+    goal.add(f)
+    t_1 = Tactic('nnf')
+    nnf_formula = Then(t_1,With('simplify',arith_lhs=True))(goal).as_expr()
+    return nnf_formula
+
+
 def _remove_or_aux(nnf_formula, guiding_model):
     nnf_op = get_op(nnf_formula)
     # Every sub-formula that isn't an 'or' or an 'and' stops the recursion.
