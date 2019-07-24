@@ -1,7 +1,7 @@
 from z3 import *
 from interval import *
 from z3_utils import negate_condition, is_binary_boolean, evaluate_binary_expr, build_binary_expression, \
-    is_binary, reverse_boolean_operator, binary_bool_op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
+    is_binary, reverse_boolean_operator, op_to_string, print_all_models, get_children_values, is_uminus_on_int_value
 
 
 class StrenghenedFormula():
@@ -142,7 +142,7 @@ class StrenghenedFormula():
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
-            print("Strnghening: " + str(lhs) + " " + binary_bool_op_to_string(op) + " " + str(rhs_value))
+            print("Strnghening: " + str(lhs) + " " + op_to_string(op) + " " + str(rhs_value))
         if op == Z3_OP_DISTINCT:
             ineq_op = self._replace_distinct_with_ineq(lhs_value, rhs_value)
             self._strengthen_binary_boolean_conjunct(lhs, lhs_value, rhs_value, ineq_op, model)

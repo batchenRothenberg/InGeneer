@@ -184,7 +184,7 @@ def build_binary_expression(lhs, rhs, op):
         return None
 
 
-def binary_bool_op_to_string(op):
+def op_to_string(op):
     if op in Z3_LE_OPS:
         return "<="
     elif op in Z3_LT_OPS:
@@ -197,6 +197,24 @@ def binary_bool_op_to_string(op):
         return "=="
     elif op in Z3_DISTINCT_OPS:
         return "!="
+    elif op in Z3_AND_OPS:
+        return "and"
+    elif op in Z3_OR_OPS:
+        return "or"
+    elif op in Z3_ADD_OPS:
+        return "+"
+    elif op in Z3_SUB_OPS:
+        return "-"
+    elif op in Z3_MUL_OPS:
+        return "*"
+    elif op in Z3_DIV_OPS:
+        return "/"
+    elif op in Z3_MOD_OPS:
+        return "%"
+    elif op in Z3_REM_OPS:
+        return "%"
+    elif op == Z3_OP_UMINUS:
+        return "-"
     else:
         print("warning Unssoported operator")
         return None

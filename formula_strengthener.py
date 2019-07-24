@@ -132,7 +132,7 @@ class StrenghenedFormula():
 
     def _strengthen_binary_boolean_conjunct(self, lhs, lhs_value, rhs_value, op, model):
         if self.debug:
-            print("Strnghening: " + str(lhs) + " " + binary_bool_op_to_string(op) + " " + str(rhs_value))
+            print("Strnghening: " + str(lhs) + " " + op_to_string(op) + " " + str(rhs_value))
         if op in Z3_DISTINCT_OPS:
             ineq_op = self._replace_distinct_with_ineq(lhs, lhs_value, rhs_value)
             self._strengthen_binary_boolean_conjunct(lhs, lhs_value, rhs_value, ineq_op, model)
