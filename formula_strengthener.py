@@ -38,15 +38,15 @@ class StrenghenedFormula():
 
     def _add_interval_for_binary_boolean(self, var, var_value, rhs_value, op):
         if op in Z3_LE_OPS:
-            self.add_interval(str(var), Interval(MINF, rhs_value))
+            self.add_interval(var.get_id(), Interval(MINF, rhs_value))
         elif op in Z3_LT_OPS:
-            self.add_interval(str(var), Interval(MINF, rhs_value - 1))
+            self.add_interval(var.get_id(), Interval(MINF, rhs_value - 1))
         elif op in Z3_GE_OPS:
-            self.add_interval(str(var), Interval(rhs_value, INF))
+            self.add_interval(var.get_id(), Interval(rhs_value, INF))
         elif op in Z3_GT_OPS:
-            self.add_interval(str(var), Interval(rhs_value + 1, INF))
+            self.add_interval(var.get_id(), Interval(rhs_value + 1, INF))
         elif op in Z3_EQ_OPS:
-            self.add_interval(str(var), Interval(rhs_value, rhs_value))
+            self.add_interval(var.get_id(), Interval(rhs_value, rhs_value))
         else:
             assert False
 

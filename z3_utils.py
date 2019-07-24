@@ -364,7 +364,7 @@ def get_model_from_SSA_trace(trace):
 def update_model(model, list_of_tuples):
     d = create_dictionary_from_model(model)
     for var,val in list_of_tuples:
-        d[str(var)]=(var,val)
+        d[var.get_id()]=(var,val)
     return create_model_from_dictionary(d)
 
 
