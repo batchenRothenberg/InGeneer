@@ -465,3 +465,10 @@ def nonstrict_to_strict_bool_op(op):
         return Z3_OP_SGT
     else:
         assert False
+
+
+def evaluate_phi_function(phi, model):
+    if model_evaluate_to_const(phi.guard, model):
+        return phi.true_var
+    else:
+        return phi.false_var
